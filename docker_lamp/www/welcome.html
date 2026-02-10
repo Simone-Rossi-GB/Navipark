@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benvenuto - LAMP Stack</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+        a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .status {
+            background: rgba(40, 167, 69, 0.3);
+            border: 1px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 LAMP Stack Attivo!</h1>
+        
+        <div class="status">
+            ✅ Il tuo stack LAMP è attivo e funzionante!
+        </div>
+        
+        <p style="text-align: center; font-size: 1.2em;">
+            Questo è il tuo ambiente di sviluppo completo con Linux, Apache, MySQL/MariaDB e PHP.
+        </p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>🌐 Apache Web Server</h3>
+                <p>Server web Apache configurato e attivo</p>
+                <p><strong>Porta:</strong> 80 (HTTP) / 443 (HTTPS)</p>
+            </div>
+            
+            <div class="card">
+                <h3>🐘 PHP</h3>
+                <p>PHP 8.2 con estensioni per MySQL</p>
+                <p><a href="index.php">Testa PHP</a></p>
+            </div>
+            
+            <div class="card">
+                <h3>🗄️ MariaDB</h3>
+                <p>Database MariaDB configurato</p>
+                <p><strong>Porta:</strong> 3306</p>
+            </div>
+            
+            <div class="card">
+                <h3>📊 phpMyAdmin</h3>
+                <p>Interfaccia web per gestire il database</p>
+                <p><a href="http://localhost:8080" target="_blank">Apri phpMyAdmin</a></p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; text-align: center;">
+            <h3>🔧 Credenziali Database</h3>
+            <p><strong>Host:</strong> database (interno al container)</p>
+            <p><strong>Database:</strong> lamp_db</p>
+            <p><strong>Username:</strong> lamp_user</p>
+            <p><strong>Password:</strong> lamp_password</p>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center; font-size: 0.9em; opacity: 0.8;">
+            <p>I tuoi file web sono nella cartella: <code>www/</code></p>
+            <p>Per arrestare i servizi: <code>docker-compose down</code></p>
+        </div>
+    </div>
+</body>
+</html>
