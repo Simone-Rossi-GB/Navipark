@@ -1,0 +1,158 @@
+
+Per il tuo sistema di parcheggi, usa Opzione 1 (Microservizi) con:
+
+PHP: Gestione utenti, prenotazioni CRUD, autenticazione, API REST principale
+Python: Analytics, predizioni disponibilità, report PDF, pulizia automatica prenotazioni scadute, notifiche, ML, analisi, task pesanti
+
+
+Architettura Consigliata
+[React Client]
+    ↓
+[Raspberry Pi]
+├── PHP API (porta 8080) - Core Business Logic
+│   ├── Autenticazione & Sessioni
+│   ├── CRUD Utenti
+│   ├── CRUD Prenotazioni
+│   ├── CRUD Parcheggi/Posti
+│   └── Validazioni
+│
+└── Python Service (porta 8000) - Advanced Features
+    ├── Analytics & Report
+    ├── Predizioni disponibilità
+    ├── Cleanup automatico prenotazioni scadute
+    ├── Generazione PDF
+    └── Invio Email/Notifiche
+
+
+
+project/
+├── docker-compose.yml
+├── db-init/
+│   └── init.sql
+│
+├── php-backend/
+│   ├── Dockerfile
+│   ├── public/
+│   │   └── index.php
+│   ├── src/
+│   │   ├── Config/
+│   │   │   └── Database.php
+│   │   ├── Controllers/
+│   │   │   ├── AuthController.php
+│   │   │   ├── ParkingController.php
+│   │   │   └── ReservationController.php
+│   │   ├── Models/
+│   │   │   ├── User.php
+│   │   │   ├── Parking.php
+│   │   │   └── Reservation.php
+│   │   ├── Middleware/
+│   │   │   └── AuthMiddleware.php
+│   │   └── Utils/
+│   │       ├── NanoID.php
+│   │       └── PythonClient.php
+│   └── composer.json
+│
+└── python-backend/
+    ├── Dockerfile
+    ├── requirements.txt
+    ├── main.py
+    ├── services/
+    │   ├── analytics.py
+    │   ├── predictions.py
+    │   ├── cleanup.py
+    │   └── notifications.py
+    └── utils/
+        └── database.py
+
+
+
+1. Capire l'architettura che hai ora
+Hai 4 container Docker che girano:
+
+lamp_web - Apache + PHP (porta 10080)
+lamp_pg_db - PostgreSQL (porta 5433)
+lamp_pgadmin - pgAdmin (porta 7089)
+lamp_python_service - Python FastAPI (porta 8000)
+
+Tutti parlano tra loro tramite la rete Docker lamp_network.
+2. Cosa devi fare ora per usarli insieme
+Lato PHP (nel tuo codice in ./www/)
+Per le operazioni normali:
+
+Crea le tue API PHP per login, registrazione, CRUD prenotazioni
+Connettiti a PostgreSQL usando PDO
+Usa l'init.sql che hai già per lo schema del database
+
+Per chiamare Python quando serve:
+
+Crea una funzione/classe PHP che fa richieste HTTP a http://python-service:8000
+Usa questa funzione quando hai bisogno di analytics, report, o cose avanzate
+Esempio: quando un utente vuole vedere statistiche di occupazione del parcheggio
+
+Lato Python (nel ./python-backend/)
+Crea endpoint FastAPI per:
+
+Analytics (es: quanti posti occupati, trend settimanali)
+Report PDF da generare
+Pulizia automatica delle prenotazioni scadute
+Predizioni di disponibilità (se vuoi fare ML)
+Invio email/notifiche
+
+Lato React (sul tuo PC)
+Nel frontend React:
+
+Chiama le API PHP per tutto il CRUD normale (login, prenotazioni, ecc)
+Chiama le API Python solo per analytics/report
+Configura due variabili d'ambiente: una per PHP API, una per Python API
+
+3. Workflow di sviluppo
+Quando sviluppi:
+
+Modifica PHP → I file in ./www/ sono montati, le modifiche sono immediate
+Modifica Python → I file in ./python-backend/ sono montati, FastAPI si ricarica automaticamente (grazie a --reload)
+Testa con curl o Postman → Prima di collegare React, testa le API
+Integra in React → Quando le API funzionano, chiamale da React
+
+4. Divisione responsabilità (la cosa più importante!)
+PHP si occupa di:
+
+Autenticazione utenti (login/logout/sessioni)
+CRUD utenti
+CRUD parcheggi
+CRUD posti
+CRUD prenotazioni
+Validazioni base
+Tutto quello che ti serve per scuola
+
+Python si occupa di:
+
+Calcolare statistiche (occupazione media, picchi di utilizzo)
+Generare grafici e report
+Pulizia automatica (job che gira ogni ora per marcare prenotazioni scadute)
+Cose avanzate/optional che vanno oltre il programma scolastico
+
+5. Prossimi step pratici
+
+Inizia da PHP - Fai funzionare login e una prenotazione base
+Testa con pgAdmin - Verifica che i dati vengano salvati nel DB
+Aggiungi un endpoint Python semplice - Es: conta quante prenotazioni attive ci sono
+Fai chiamare Python da PHP - Per vedere che comunicano
+Integra React - Collega il frontend alle tue API PHP
+Aggiungi features Python - Quando il base funziona, aggiungi analytics
+
+6. Debug e verifica
+Per vedere i log:
+
+docker-compose logs -f php → log Apache/PHP
+docker-compose logs -f python-service → log FastAPI
+docker-compose logs -f database → log PostgreSQL
+
+Per entrare nei container:
+
+docker exec -it lamp_web bash → entra nel container PHP
+docker exec -it lamp_python_service bash → entra nel container Python
+
+Per riavviare dopo modifiche al compose:
+
+docker-compose down
+docker-compose up -d
