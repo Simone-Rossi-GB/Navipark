@@ -1,0 +1,93 @@
+services:
+  # Servizio Apache + PHP
+  web:
+    build:
+      context: ./apache-php
+      dockerfile: Dockerfile
+      # args:
+      # Configurazione proxy opzionale
+      # Decommentare e configurare se necessario:
+      # PROXY_HOST: "host.docker.internal"  # o l'IP della macchina host
+      # PROXY_PORT: "8888"                  # porta del proxy
+    container_name: lamp_web
+    ports:
+      - "10080:80"
+      - "10443:443"
+    volumes:
+      - ./www:/var/www/html
+      - ./apache-config:/etc/apache2/sites-available
+    networks:
+      - lamp_network
+    depends_on:
+      - database
+      - python-service
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+      - PYTHON_SERVICE_URL=http://python-service:8000
+
+  # Servizio MariaDB
+  database:
+    image: arm64v8/postgres:18-alpine3.23
+    container_name: lamp_pg_db
+    restart: always
+    ports:
+      - "5433:5432"
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d
+    networks:
+      - lamp_network
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+
+  # Servizio phpMyAdmin (opzionale per gestire il database)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: lamp_pgadmin
+    restart: always
+    ports:
+      - "7089:80"
+    networks:
+      - lamp_network
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+  python-service:
+    build:
+      context: ./python-backend
+      dockerfile: Dockerfile
+    container_name: lamp_python_service
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./python-backend:/app
+    networks:
+      - lamp_network
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=postgresql://root:password@lamp_pg_db:5432/postgres
+
+#  mailcatcher:
+#    restart: on-failure
+#    image: haravich/fake-smtp-server
+#    ports:
+#      - "1080:1080"
+#      - "1025:1025"
+
+# Definizione della rete personalizzata
+networks:
+  lamp_network:
+    driver: bridge
+
+# Volumi persistenti
+volumes:
+  db_data:
+    driver: local
+  local_pgdata:
+  pgadmin-data:

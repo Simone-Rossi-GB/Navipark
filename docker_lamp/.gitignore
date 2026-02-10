@@ -1,0 +1,27 @@
+# Docker
+.docker/
+
+# Logs
+*.log
+logs/
+
+# Backup database
+*.sql
+!db-init/*.sql
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Environment variables (se contiene dati sensibili)
+# .env
