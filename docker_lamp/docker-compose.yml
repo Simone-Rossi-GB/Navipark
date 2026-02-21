@@ -4,11 +4,11 @@ services:
     build:
       context: ./apache-php
       dockerfile: Dockerfile
-      # args:
+      args:
       # Configurazione proxy opzionale
       # Decommentare e configurare se necessario:
-      # PROXY_HOST: "host.docker.internal"  # o l'IP della macchina host
-      # PROXY_PORT: "8888"                  # porta del proxy
+        PROXY_HOST: "127.0.0.1"  # o l'IP della macchina host
+        PROXY_PORT: "8888"                  # porta del proxy
     container_name: lamp_web
     ports:
       - "10080:80"
@@ -27,7 +27,7 @@ services:
 
   # Servizio MariaDB
   database:
-    image: arm64v8/postgres:18-alpine3.23
+    image: postgres:18-alpine3.23
     container_name: lamp_pg_db
     restart: always
     ports:
@@ -63,7 +63,7 @@ services:
     container_name: lamp_python_service
     restart: always
     ports:
-      - "8000:8000"
+      - "9000:9000"
     volumes:
       - ./python-backend:/app
     networks:
