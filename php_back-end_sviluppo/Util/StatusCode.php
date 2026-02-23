@@ -12,4 +12,10 @@ class StatusCode
         'errorCode' => 'D001',
         'message' => 'Connessione al database fallita'
     ];
+
+    public const VALIDATION_REQUEST_FAILED = [
+        'httpStatus' => 400,
+        'errorCode' => 'V001',
+        'message' => 'Fallita la validazione della richiesta'
+    ];
 }
