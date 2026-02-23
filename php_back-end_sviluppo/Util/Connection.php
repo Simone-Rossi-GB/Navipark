@@ -8,11 +8,31 @@ use PDOException;
 class Connection
 {
     private static ?PDO $istance = null;
+    private static array $config = [
+        'dsn' => 'pgsql:host=lamp_pg_db;port=5432;dbname=postgres',
+        'username' => 'root',
+        'password' => 'password'
+    ];
 
-    public static function getIstance(array $config): PDO
+    private function __construct()
     {
-        if (self::$istance === null) {
 
+    }
+
+    public static function getIstance(): PDO
+    {
+        if (!isset(self::$istance)) {
+            try {
+                self::$istance = new PDO(
+                    self::$config['dsn'],
+                    self::$config['username'],
+                    self::$config['password']
+                );
+                self::$istance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } catch (PDOException $e) {
+                // Handle connection error
+                throw new RuntimeException("[Connection.php] Database connection failed: " . $e->getMessage());
+            }
         }
         return self::$istance;
     }
