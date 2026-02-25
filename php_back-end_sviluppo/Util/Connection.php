@@ -16,7 +16,7 @@ class Connection
 
     private function __construct()
     {
-
+        // vuoto per non permettere la creazione di oggetti
     }
 
     public static function getIstance(): PDO
