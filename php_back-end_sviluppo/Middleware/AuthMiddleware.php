@@ -8,6 +8,10 @@ class AuthMiddleware
 
     }
 
+    public static function validateAuthRequest() {
+
+    }
+
     public static function login() {
 
     }
