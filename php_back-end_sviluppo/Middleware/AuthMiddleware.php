@@ -17,6 +17,6 @@ class AuthMiddleware
     }
 
     public static function generateToken() {
-        
+
     }
 }
