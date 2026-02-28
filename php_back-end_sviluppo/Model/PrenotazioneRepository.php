@@ -3,7 +3,7 @@
 namespace Model;
 use Util\Connection;
 
-class TennistaRepository{
+class PrenotazioneRepository{
 
     private $config;
 
