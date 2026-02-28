@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import ParkingMap from '../features/ParkingMap'
 
 const parkings = [
   { id: 1, name: 'Parcheggio Centro', address: 'Piazza della Loggia, Brescia', totalSpots: 100, freeSpots: 25, price: 2.5 },
@@ -28,7 +29,8 @@ export default function Home() {
   return (
     <main className="p-6">
       <h2 className="text-2xl font-semibold mb-4">Parcheggi disponibili</h2>
-      <table className="w-full border">
+      <ParkingMap />
+      <table className="w-full border mt-6">
         <thead>
           <tr className="bg-gray-100">
             <th className="p-2 border">Nome</th>
