@@ -5,19 +5,24 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import './App.css'
 
+function AppRoutes({ logged, setLogged }) {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login onLogin={() => setLogged(true)} />} />
+      <Route path="/" element={logged ? <Home /> : <Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to={logged ? '/' : '/login'} />} />
+    </Routes>
+  )
+}
+
 export default function App() {
   const [logged, setLogged] = useState(false)
-
-  if (!logged) return <Login onLogin={() => setLogged(true)} />
 
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+        <AppRoutes logged={logged} setLogged={setLogged} />
       </div>
     </BrowserRouter>
   )
