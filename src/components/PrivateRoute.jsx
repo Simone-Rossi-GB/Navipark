@@ -1,24 +1,11 @@
 // Componente per la protezione delle rotte: consente l'accesso solo agli utenti autenticati
 
-import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
-import { useAuth } from '../context/authContext';
+import { useAuthContext } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
-  const { currentUser } = useAuth();
-
-  return (
-    <Route
-      {...rest}
-      render={props =>
-        currentUser ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
-        )
-      }
-    />
-  );
-};
-
-export default PrivateRoute;
+// Versione aggiornata per React Router v6
+export default function PrivateRoute({ children }) {
+  const { user } = useAuthContext();
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+}
