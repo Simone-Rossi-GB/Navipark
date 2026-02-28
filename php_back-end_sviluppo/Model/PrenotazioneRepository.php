@@ -5,12 +5,6 @@ use Util\Connection;
 
 class PrenotazioneRepository{
 
-    private $config;
-
-    public function __construct($config){
-        $this->config = $config;
-    }
-
     public function getPrenotazioneById(string $id) : array{
         $pdo = Connection::getInstance();
         $stmt = $pdo->prepare('SELECT * FROM prenotazioni WHERE id = :id');

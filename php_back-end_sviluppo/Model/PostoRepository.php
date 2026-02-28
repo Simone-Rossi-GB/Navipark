@@ -4,13 +4,7 @@ namespace Model;
 use Util\Connection;
 
 class PostoRepository{
-
-    private $config;
-
-    public function __construct($config){
-        $this->config = $config;
-    }
-
+    
     public function getPostoById(string $id) : array{
         $pdo = Connection::getInstance();
         $stmt = $pdo->prepare('SELECT * FROM posti WHERE id = :id');
