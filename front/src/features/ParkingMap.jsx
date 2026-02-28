@@ -2,7 +2,8 @@ import React from 'react'
 import Map, { Marker } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
-const MAPBOX_TOKEN = 'INSERISCI_LA_TUA_MAPBOX_TOKEN'; // Sostituisci con la tua token Mapbox
+// Usa la variabile d'ambiente per il token
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
 const parkings = [
   { id: 1, name: 'Parcheggio Centro', lat: 45.5397, lng: 10.2205 },
@@ -11,6 +12,14 @@ const parkings = [
 ]
 
 export default function ParkingMap() {
+  if (!MAPBOX_TOKEN) {
+    return (
+      <div style={{ color: 'red', padding: 16 }}>
+        Errore: Mapbox token non trovato. Imposta VITE_MAPBOX_TOKEN nel file .env.
+      </div>
+    );
+  }
+
   return (
     <div className="my-6" style={{ height: 400 }}>
       <Map
