@@ -4,13 +4,7 @@ namespace Model;
 use Util\Connection;
 
 class ParcheggioRepository{
-
-    private $config;
-
-    public function __construct($config){
-        $this->config = $config;
-    }
-
+    
     public function getParcheggioById(string $id) : array{
         $pdo = Connection::getInstance();
         $stmt = $pdo->prepare('SELECT * FROM parcheggi WHERE id = :id');
