@@ -14,6 +14,18 @@ class SessioneRepository{
         return $stmt->fetch();
     }
 
+    public function checkToken(string $utente_id, string $token)
+    {
+        $pdo = Connection::getIstance();
+        $stmt = $pdo->prepare('SELECT token FROM sessioni WHERE utente_id = :utente_id');
+        $stmt->execute([
+            'utente_id' => $utente_id
+        ]);
+
+        $tokenDB = $stmt->fetch();
+        return $tokenDB == $token;
+    }
+
     public function getSessioneById(string $id) : array{
         $pdo = Connection::getInstance();
         $stmt = $pdo->prepare('SELECT * FROM sessioni WHERE id = :id');
