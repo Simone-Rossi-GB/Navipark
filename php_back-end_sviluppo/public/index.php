@@ -1,6 +1,7 @@
 <?php
 use Slim\Factory\AppFactory;
 use DI\Container;
+use Controller\ParcheggioController;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -16,6 +17,6 @@ $app->setBasePath($config['BASEPATH']);
 (require __DIR__ . '/../conf/routes.php')($app);
 
 //Esempio di rotta che prende i suoi dati dal database
-$app->get('/tennisti/{id}', TennistaController::class . ':listById');
+$app->get('/v1/parcheggio/id/{id}', ParcheggioController::class . ':parcheggioById');
 
 $app->run();
