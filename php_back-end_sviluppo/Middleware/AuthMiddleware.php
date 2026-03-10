@@ -4,6 +4,7 @@ namespace Middleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Controller\AuthController as ac;
+use Util\JsonResponse;
 
 class AuthMiddleware
 {
@@ -14,12 +15,29 @@ class AuthMiddleware
         $result = ac::controlToken($utente_id, $token);
     }
 
-    public static function validateAuthRequest($request, $handler) {
+    public static function validateAuthRequest($request)
+    {
+        $authHeader = $request->getHeaderLine('Authorizarion');
 
+        if (empty($authHeader)) {
+            return JsonResponse::error('token mancante', \StatusCode::AUTH_TOKEN_NOT_FOUND);
+        }
+
+        $jwtRegex = '/^Bearer\s+([a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+)$/';
+
+        if (!preg_match($jwtRegex, $authHeader, $matches)) {
+            return JsonResponse::error('token non rispetta il regex', \StatusCode::VALIDATION_REQUEST_FAILED);
+        }
+
+        $token = $matches[1];
+
+        return $token;
     }
 
-    public static function login($request, $handler) {
-
+    public static function login($request, $handler)
+    {
+        Response $response =
+        return $response;
     }
 
     public static function register($request, $handler) {
