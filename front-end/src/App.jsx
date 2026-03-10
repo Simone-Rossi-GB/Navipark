@@ -1,0 +1,66 @@
+import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import { useAuth } from './hooks/useAuth'
+import Header from './components/Header'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import AdminDashboard from './pages/AdminDashboard'
+import Profile from './pages/Profile'
+import './App.css'
+
+function ProtectedRoute({ children, adminOnly = false }) {
+  const { user, isAdmin } = useAuth()
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (adminOnly && !isAdmin()) {
+    return <Navigate to="/" replace />
+  }
+
+  return children
+}
+
+function AppRoutes() {
+  const { user } = useAuth()
+
+  return (
+    <Routes>
+      <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
+      {/* Home è PUBBLICA - chiunque può vedere la mappa */}
+      <Route path="/" element={<Home />} />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute adminOnly={true}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <div className="app-wrapper">
+          <Header />
+          <AppRoutes />
+        </div>
+      </AuthProvider>
+    </BrowserRouter>
+  )
+}
