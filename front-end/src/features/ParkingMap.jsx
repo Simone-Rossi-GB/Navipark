@@ -49,7 +49,6 @@ export default function ParkingMap({ parkings, onParkingClick }) {
 
   const handleMarkerClick = (parking) => {
     setSelectedParking(parking)
-    if (onParkingClick) onParkingClick(parking)
   }
 
   const handleMapError = (error) => {
