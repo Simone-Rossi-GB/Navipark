@@ -21,12 +21,17 @@ export default function Header() {
         </Link>
 
         <nav className="header-nav">
-          <Link to="/" className="nav-link">
+            <Link to="/" className="nav-link">
             <span className="nav-icon">🗺️</span>
             <span>Mappa</span>
-          </Link>
+            </Link>
 
-          {user && isAdmin() && (
+            <Link to="/search" className="nav-link">
+                <span className="nav-icon">🔍️</span>
+                <span>Cerca prenotazione</span>
+            </Link>
+
+            {user && isAdmin() && (
             <Link to="/admin" className="nav-link">
               <span className="nav-icon">📊</span>
               <span>Dashboard</span>

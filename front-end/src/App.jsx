@@ -5,6 +5,7 @@ import { useAuth } from './hooks/useAuth'
 import Header from './components/Header'
 import Home from './pages/Home'
 import Login from './pages/Login'
+import Search from './pages/Search'
 import AdminDashboard from './pages/AdminDashboard'
 import Profile from './pages/Profile'
 import './App.css'
@@ -31,6 +32,8 @@ function AppRoutes() {
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
       {/* Home è PUBBLICA - chiunque può vedere la mappa */}
       <Route path="/" element={<Home />} />
+      {/* Search è PUBBLICA - chiunque può cercare una prenotazione */}
+      <Route path="/search" element={<Search />} />
       <Route
         path="/profile"
         element={
