@@ -267,13 +267,6 @@ export default function AdminDashboard() {
               <div className="stat-label">Ricavi Totali</div>
             </div>
           </div>
-          <div className="stat-card green" title="Ogni prenotazione in parcheggio centralizzato evita ~0.24 kg CO₂ rispetto a guidare alla ricerca di parcheggio">
-            <div className="stat-icon">🌱</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.co2Saved} kg</div>
-              <div className="stat-label">CO₂ Risparmiata ℹ️</div>
-            </div>
-          </div>
         </div>
       )}
 
