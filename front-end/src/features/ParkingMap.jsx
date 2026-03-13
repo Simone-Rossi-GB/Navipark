@@ -37,6 +37,7 @@ const buildingLayer = {
 }
 
 export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'streets-v12' }) {
+  const isSatellite = mapStyle.startsWith('satellite')
   const [selectedParking, setSelectedParking] = useState(null)
   const [mapError, setMapError] = useState(null)
   const [viewState, setViewState] = useState({
@@ -80,8 +81,8 @@ export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'stree
         mapStyle={`mapbox://styles/mapbox/${mapStyle}`}
         mapboxAccessToken={MAPBOX_TOKEN}
       >
-        {/* Layer 3D Buildings */}
-        <Layer {...buildingLayer} />
+        {/* Layer 3D Buildings (disabilitato in modalità satellite) */}
+        {!isSatellite && <Layer {...buildingLayer} />}
 
         {/* Marker parcheggi con prezzi */}
         {parkings && parkings.map((parking) => (
