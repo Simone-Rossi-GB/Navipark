@@ -15,6 +15,7 @@ export default function Home() {
     minFreeSpots: 0,
     amenities: []
   })
+  const [mapStyle, setMapStyle] = useState('streets-v12')
   const [selectedParking, setSelectedParking] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [bookingData, setBookingData] = useState({
@@ -93,6 +94,23 @@ export default function Home() {
       {/* Sidebar con filtri */}
       <aside className="sidebar">
         <FilterPanel onFilterChange={setFilters} />
+
+        {/* Selettore stile mappa */}
+        <div className="map-style-selector">
+          <h3 className="filter-section-title">Stile Mappa</h3>
+          <select
+            value={mapStyle}
+            onChange={(e) => setMapStyle(e.target.value)}
+            className="style-select"
+          >
+            <option value="streets-v12">🗺️ Streets (Google Maps)</option>
+            <option value="outdoors-v12">🌲 Outdoors (Natura)</option>
+            <option value="satellite-streets-v12">🛰️ Satellite</option>
+            <option value="light-v11">☀️ Light (Minimalista)</option>
+            <option value="dark-v11">🌙 Dark (Scuro)</option>
+            <option value="navigation-day-v1">🚗 Navigazione</option>
+          </select>
+        </div>
       </aside>
 
       {/* Mappa principale */}
@@ -100,6 +118,7 @@ export default function Home() {
         <ParkingMap
           parkings={filteredParkings}
           onParkingClick={handleParkingClick}
+          mapStyle={mapStyle}
         />
 
         {/* Contatore parcheggi trovati */}

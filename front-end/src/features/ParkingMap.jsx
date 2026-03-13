@@ -36,7 +36,7 @@ const buildingLayer = {
   }
 }
 
-export default function ParkingMap({ parkings, onParkingClick }) {
+export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'streets-v12' }) {
   const [selectedParking, setSelectedParking] = useState(null)
   const [mapError, setMapError] = useState(null)
   const [viewState, setViewState] = useState({
@@ -77,7 +77,7 @@ export default function ParkingMap({ parkings, onParkingClick }) {
         onMove={(evt) => setViewState(evt.viewState)}
         onError={handleMapError}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="mapbox://styles/mapbox/streets-v12"
+        mapStyle={`mapbox://styles/mapbox/${mapStyle}`}
         mapboxAccessToken={MAPBOX_TOKEN}
       >
         {/* Layer 3D Buildings */}
