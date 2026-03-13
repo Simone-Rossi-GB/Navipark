@@ -1,0 +1,124 @@
+/* Visually-hidden real input */
+.cb-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Wrapper label */
+.cb-label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cb-label--md {
+  gap: 0.75rem;
+}
+
+.cb-label--disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* The visual box */
+.cb-box {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 4px;
+  border: 1.5px solid var(--border-medium);
+  background-color: var(--bg-card);
+  color: white;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cb-box--md {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 6px;
+}
+
+.cb-box--offset {
+  margin-top: 2px;
+}
+
+.cb-box--checked {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.cb-box--disabled {
+  background-color: var(--bg-main);
+  border-color: var(--border-light);
+  cursor: not-allowed;
+}
+
+/* Hover: highlight border when unchecked */
+.cb-label:not(.cb-label--disabled):hover .cb-box:not(.cb-box--checked) {
+  border-color: var(--primary-blue);
+}
+
+/* Focus ring on the real input → style the box */
+.cb-input:focus-visible ~ .cb-box,
+.cb-label:focus-within .cb-box {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* Checkmark / dash SVG */
+.cb-icon {
+  width: 10px;
+  height: 10px;
+}
+
+.cb-box--md .cb-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Text column */
+.cb-text {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.cb-text__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.cb-text__hint {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Dark mode */
+[data-theme="dark"] .cb-box {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .cb-box--checked {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .cb-box--disabled {
+  background-color: #0f172a;
+  border-color: #334155;
+}
