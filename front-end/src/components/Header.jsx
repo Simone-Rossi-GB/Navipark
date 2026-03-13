@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import * as api from '../services/api'
@@ -9,6 +9,7 @@ export default function Header() {
   const [activeBookings, setActiveBookings] = useState(0)
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark')
   const navigate = useNavigate()
+  const menuRef = useRef(null)
 
   // Carica conteggio prenotazioni attive
   useEffect(() => {
@@ -25,6 +26,18 @@ export default function Header() {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
     localStorage.setItem('theme', darkMode ? 'dark' : 'light')
   }, [darkMode])
+
+  // Chiudi menu cliccando fuori
+  useEffect(() => {
+    if (!showMenu) return
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showMenu])
 
   const handleLogout = () => {
     logout()
@@ -67,7 +80,7 @@ export default function Header() {
           </button>
 
           {user ? (
-            <div className="header-user">
+            <div className="header-user" ref={menuRef}>
               <button className="user-button" onClick={() => setShowMenu(!showMenu)}>
                 <div className="user-avatar-wrapper">
                   <span className="user-avatar">
