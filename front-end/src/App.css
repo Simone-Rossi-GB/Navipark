@@ -4,7 +4,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* ogni pagina gestisce il proprio scroll */
 }
 
 /* ==================== HEADER ==================== */
@@ -63,6 +63,16 @@
 .nav-link:hover {
   background: var(--bg-main);
   color: var(--primary-blue);
+}
+
+.nav-link.active {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.nav-link.active:hover {
+  background: var(--primary-blue-hover);
+  color: white;
 }
 
 .nav-icon {
@@ -762,7 +772,8 @@
 
 /* ==================== LOGIN PAGE ==================== */
 .login-container {
-  min-height: 100vh;
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -872,7 +883,9 @@
 
 /* ==================== SEARCH PAGE ==================== */
 .search-page {
-  min-height: calc(100vh - 65px);
+  flex: 1;
+  height: 0; /* necessario con flex per abilitare overflow */
+  overflow-y: auto;
   background: var(--bg-main);
   padding: 2rem 1rem;
 }
@@ -880,6 +893,59 @@
 .search-container {
   max-width: 800px;
   margin: 0 auto;
+}
+
+/* Dev hint codici mock */
+.dev-hint {
+  margin-bottom: 1.25rem;
+  padding: 0.75rem 1rem;
+  background: #fffbeb;
+  border: 1px dashed #f59e0b;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: #92400e;
+}
+
+.dev-hint summary {
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
+
+.dev-codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.dev-code-btn {
+  padding: 0.375rem 0.75rem;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius-full);
+  font-family: 'Courier New', monospace;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #92400e;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dev-code-btn:hover {
+  background: #fde68a;
+}
+
+[data-theme="dark"] .dev-hint {
+  background: #1c1a0a;
+  border-color: #b45309;
+  color: #fde68a;
+}
+
+[data-theme="dark"] .dev-code-btn {
+  background: #292113;
+  border-color: #b45309;
+  color: #fde68a;
 }
 
 .search-header {
@@ -1137,7 +1203,9 @@
 
 /* ==================== ADMIN DASHBOARD ==================== */
 .admin-dashboard {
-  min-height: calc(100vh - 65px);
+  flex: 1;
+  height: 0;
+  overflow-y: auto;
   background: var(--bg-main);
   padding: 2rem;
 }
@@ -1446,9 +1514,95 @@
   background: var(--primary-blue-hover);
 }
 
+/* Admin Tabs */
+.admin-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-tab {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-weight: 600;
+  border: 2px solid var(--border-light);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-tab:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.admin-tab.active {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  background: #ef4444;
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.admin-tab.active .tab-badge {
+  background: rgba(255,255,255,0.3);
+}
+
+.crud-header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Booking status badges */
+.booking-status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-completed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-expired {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 /* ==================== PROFILE PAGE ==================== */
 .profile-page {
-  min-height: calc(100vh - 65px);
+  flex: 1;
+  height: 0;
+  overflow-y: auto;
   background: var(--bg-main);
   padding: 2rem 1rem;
 }
@@ -1795,6 +1949,110 @@
 
 .btn-modal-confirm:hover {
   background: #b91c1c;
+}
+
+/* ==================== TOAST NOTIFICATIONS ==================== */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: white;
+  pointer-events: all;
+  cursor: pointer;
+  animation: toast-in 0.3s ease;
+  max-width: 360px;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.toast-success { background: #16a34a; }
+.toast-error   { background: #dc2626; }
+.toast-info    { background: var(--primary-blue); }
+.toast-warning { background: #d97706; }
+
+.toast-icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+/* ==================== FORM VALIDATION ==================== */
+.field-error {
+  font-size: 0.8125rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+/* ==================== BADGE PRENOTAZIONI ==================== */
+.user-avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.booking-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  line-height: 1;
+}
+
+/* ==================== DARK MODE TOGGLE ==================== */
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  background: var(--border-light);
 }
 
 /* ==================== RESPONSIVE ==================== */
