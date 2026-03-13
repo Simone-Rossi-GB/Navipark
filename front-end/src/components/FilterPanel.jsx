@@ -40,10 +40,6 @@ export default function FilterPanel({ onFilterChange }) {
 
   return (
     <div className="filter-panel">
-      <div className="filter-header">
-        <h2 className="filter-title">ParcheggioBrescia</h2>
-      </div>
-
       {/* Tipo Parcheggio */}
       <div className="filter-section">
         <h3 className="filter-section-title">Tipo Parcheggio</h3>

@@ -190,6 +190,8 @@
   border-right: 1px solid var(--border-light);
   overflow-y: auto;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .map-main {
@@ -200,10 +202,12 @@
 
 /* ==================== FILTER PANEL ==================== */
 .filter-panel {
+  flex: 1;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  justify-content: space-between;
+  gap: 0;
 }
 
 .filter-header {
