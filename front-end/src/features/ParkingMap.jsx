@@ -97,7 +97,7 @@ export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'stree
           >
             <div className="marker-container">
               <div className="price-tag">
-                €{parking.price}/h
+                €{parking.tariffa_oraria ?? parking.price}/h
               </div>
               <div className="marker-dot"></div>
             </div>
@@ -118,18 +118,18 @@ export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'stree
             <div className="parking-popup">
               <img
                 src={selectedParking.image}
-                alt={selectedParking.name}
+                alt={selectedParking.nome ?? selectedParking.name}
                 className="popup-image"
               />
-              <h3 className="popup-title">{selectedParking.name}</h3>
-              <p className="popup-price">€{selectedParking.price}/ora</p>
+              <h3 className="popup-title">{selectedParking.nome ?? selectedParking.name}</h3>
+              <p className="popup-price">€{(selectedParking.tariffa_oraria ?? selectedParking.price)}/ora</p>
               <p className="popup-spots">
-                <span className={selectedParking.freeSpots < 10 ? 'text-red' : 'text-green'}>
-                  {selectedParking.freeSpots}
+                <span className={(selectedParking.posti_liberi ?? selectedParking.freeSpots) < 10 ? 'text-red' : 'text-green'}>
+                  {selectedParking.posti_liberi ?? selectedParking.freeSpots}
                 </span>
-                /{selectedParking.totalSpots} posti liberi
+                /{selectedParking.capacita_totale ?? selectedParking.totalSpots} posti liberi
               </p>
-              <p className="popup-address">{selectedParking.address}</p>
+              <p className="popup-address">{selectedParking.indirizzo ?? selectedParking.address}</p>
               <button
                 className="popup-button"
                 onClick={() => onParkingClick && onParkingClick(selectedParking)}
