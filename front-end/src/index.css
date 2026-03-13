@@ -140,6 +140,48 @@
   color: #94a3b8;
 }
 
+/* Dark mode: badge tipo parcheggio */
+[data-theme="dark"] .type-badge.coperto {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .type-badge.scoperto {
+  background: #451a03;
+  color: #fde68a;
+}
+
+/* Dark mode: pulsanti modifica e cancella nella dashboard */
+[data-theme="dark"] .btn-edit {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .btn-edit:hover {
+  background: #1e40af;
+}
+
+[data-theme="dark"] .btn-delete {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .btn-delete:hover {
+  background: #991b1b;
+}
+
+/* Dark mode: pulsanti annulla prenotazione */
+[data-theme="dark"] .btn-cancel,
+[data-theme="dark"] .action-button.cancel {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .btn-cancel:hover,
+[data-theme="dark"] .action-button.cancel:hover {
+  background: #991b1b;
+}
+
 /* Dark mode: badge stato prenotazioni */
 [data-theme="dark"] .badge-active {
   background: #064e3b;
