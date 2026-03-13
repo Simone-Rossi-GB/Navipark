@@ -1,3 +1,51 @@
+/* Tailwind utilities (senza preflight per non sovrascrivere lo stile esistente) */
+@import "tailwindcss/utilities";
+
+/* Token colore per il componente Checkbox di Untitled UI */
+@theme {
+  /* Checkbox unchecked background/border */
+  --background-color-primary: #ffffff;
+  --ring-color-primary: #d1d5db;
+  /* Checkbox checked background/border (brand) */
+  --background-color-brand-solid: #2563eb;
+  --background-color-bg-brand-solid: #2563eb;
+  --color-bg-brand-solid: #2563eb;
+  /* Checkbox disabled */
+  --background-color-disabled_subtle: #f9fafb;
+  --ring-color-disabled: #e5e7eb;
+  /* Checkmark SVG colors */
+  --color-fg-white: #ffffff;
+  --color-fg-disabled_subtle: #d1d5db;
+  /* Focus ring */
+  --outline-color-focus-ring: #2563eb;
+  /* Label text */
+  --text-color-secondary: #374151;
+  --text-color-tertiary: #6b7280;
+}
+
+/* Utility custom transition-inherit-all (usata dal checkbox) */
+@utility transition-inherit-all {
+  transition-property: inherit;
+  transition-duration: inherit;
+  transition-timing-function: inherit;
+}
+
+/* Dark mode: token checkbox */
+[data-theme="dark"] {
+  --background-color-primary: #1e293b;
+  --ring-color-primary: #475569;
+  --background-color-brand-solid: #2563eb;
+  --background-color-bg-brand-solid: #2563eb;
+  --color-bg-brand-solid: #2563eb;
+  --background-color-disabled_subtle: #0f172a;
+  --ring-color-disabled: #334155;
+  --color-fg-white: #ffffff;
+  --color-fg-disabled_subtle: #475569;
+  --outline-color-focus-ring: #3b82f6;
+  --text-color-secondary: #e2e8f0;
+  --text-color-tertiary: #94a3b8;
+}
+
 /* Reset & Base */
 * {
   box-sizing: border-box;

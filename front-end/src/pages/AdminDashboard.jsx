@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { useToast } from '../context/ToastContext'
 import * as api from '../services/api'
+import { Checkbox } from '@/components/base/checkbox/checkbox'
 
 const EMPTY_PARKING_FORM = {
   nome: '',
@@ -484,10 +485,12 @@ export default function AdminDashboard() {
                 <label>Servizi</label>
                 <div className="amenities-checkboxes">
                   {SERVIZI.map(s => (
-                    <label key={s} className="amenity-checkbox">
-                      <input type="checkbox" checked={parkingForm.servizi.includes(s)} onChange={() => toggleServizio(s)} />
-                      <span>{s}</span>
-                    </label>
+                    <Checkbox
+                      key={s}
+                      label={s}
+                      isSelected={parkingForm.servizi.includes(s)}
+                      onChange={() => toggleServizio(s)}
+                    />
                   ))}
                 </div>
               </div>
