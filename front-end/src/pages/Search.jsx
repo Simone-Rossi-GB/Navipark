@@ -1,54 +1,59 @@
 import React, { useState } from 'react'
-import { initialBookings } from '../features/mockData'
+import { useToast } from '../context/ToastContext'
+import * as api from '../services/api'
+
+// Codici disponibili nei dati mock (solo per sviluppo)
+const MOCK_CODES = ['A7B2C9D1', 'E3F6G8H4', 'K1L5M0N7', 'P2Q4R6S8', 'T5U0V3W9', 'X7Y1Z4A0', 'B8C2D5E3']
 
 export default function Search() {
+  const { addToast } = useToast()
   const [searchCode, setSearchCode] = useState('')
   const [booking, setBooking] = useState(null)
   const [error, setError] = useState('')
   const [searching, setSearching] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault()
     setError('')
     setBooking(null)
     setSearching(true)
-
-    // Simula ricerca (sostituire con API call)
-    setTimeout(() => {
-      const found = initialBookings.find(
-        (b) => b.uniqueCode.toLowerCase() === searchCode.toLowerCase()
-      )
-
-      if (found) {
-        setBooking(found)
-      } else {
-        setError('Prenotazione non trovata. Verifica il codice inserito.')
-      }
-      setSearching(false)
-    }, 500)
+    const res = await api.getPrenotazioneByCodice(searchCode.trim())
+    setSearching(false)
+    if (res.success) {
+      setBooking(res.data)
+    } else {
+      setError('Prenotazione non trovata. Verifica il codice inserito.')
+    }
   }
 
-  const formatDate = (isoString) => {
-    if (!isoString) return 'N/A'
-    const date = new Date(isoString)
-    return date.toLocaleString('it-IT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+  const handleCancel = async () => {
+    const res = await api.cancelPrenotazione(booking.id)
+    if (res.success) {
+      setBooking({ ...booking, stato: 'annullata' })
+      addToast('Prenotazione annullata con successo', 'success')
+    } else {
+      addToast(res.message || 'Errore durante l\'annullamento', 'error')
+    }
+    setShowCancelModal(false)
+  }
+
+  const formatDate = (iso) => {
+    if (!iso) return 'N/A'
+    return new Date(iso).toLocaleString('it-IT', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     })
   }
 
-  const getStatusBadge = (status) => {
-    const badges = {
-      active: { label: 'Attiva', class: 'badge-active' },
-      cancelled: { label: 'Annullata', class: 'badge-cancelled' },
-      completed: { label: 'Completata', class: 'badge-completed' },
-      expired: { label: 'Scaduta', class: 'badge-expired' }
-    }
-    return badges[status] || badges.active
+  const statusBadge = {
+    attiva:     { label: 'Attiva',     cls: 'badge-active' },
+    annullata:  { label: 'Annullata',  cls: 'badge-cancelled' },
+    completata: { label: 'Completata', cls: 'badge-completed' },
+    scaduta:    { label: 'Scaduta',    cls: 'badge-expired' },
   }
+
+  const badge = booking ? (statusBadge[booking.stato] || statusBadge.attiva) : null
 
   return (
     <div className="search-page">
@@ -60,22 +65,32 @@ export default function Search() {
           </p>
         </div>
 
+        {/* Banner codici demo — visibile solo in sviluppo */}
+        <div className="dev-hint">
+          <details>
+            <summary>🛠️ Codici di prova disponibili (clicca per espandere)</summary>
+            <div className="dev-codes">
+              {MOCK_CODES.map(c => (
+                <button key={c} type="button" className="dev-code-btn" onClick={() => setSearchCode(c)}>
+                  {c}
+                </button>
+              ))}
+            </div>
+          </details>
+        </div>
+
         <form onSubmit={handleSearch} className="search-form">
           <div className="search-input-group">
             <input
               type="text"
-              placeholder="Inserisci codice prenotazione (es: ABC12345)"
+              placeholder="Es: A7B2C9D1"
               value={searchCode}
-              onChange={(e) => setSearchCode(e.target.value.toUpperCase())}
+              onChange={e => setSearchCode(e.target.value.toUpperCase())}
               className="search-input"
-              maxLength="50"
+              maxLength="20"
               required
             />
-            <button
-              type="submit"
-              className="search-button"
-              disabled={searching || !searchCode.trim()}
-            >
+            <button type="submit" className="search-button" disabled={searching || !searchCode.trim()}>
               {searching ? '🔄 Ricerca...' : '🔍 Cerca'}
             </button>
           </div>
@@ -92,9 +107,7 @@ export default function Search() {
           <div className="booking-result">
             <div className="result-header">
               <h2>Prenotazione Trovata</h2>
-              <span className={`status-badge ${getStatusBadge(booking.status).class}`}>
-                {getStatusBadge(booking.status).label}
-              </span>
+              <span className={`status-badge ${badge.cls}`}>{badge.label}</span>
             </div>
 
             <div className="result-body">
@@ -103,15 +116,15 @@ export default function Search() {
                 <div className="info-grid">
                   <div className="info-item">
                     <span className="info-label">Codice:</span>
-                    <span className="info-value code">{booking.uniqueCode}</span>
+                    <span className="info-value code">{booking.codice_prenotazione}</span>
                   </div>
                   <div className="info-item">
                     <span className="info-label">Parcheggio:</span>
-                    <span className="info-value">{booking.parkingName}</span>
+                    <span className="info-value">{booking.parcheggio_nome}</span>
                   </div>
                   <div className="info-item">
                     <span className="info-label">Targa:</span>
-                    <span className="info-value">{booking.licensePlate}</span>
+                    <span className="info-value">{booking.targa}</span>
                   </div>
                 </div>
               </div>
@@ -121,27 +134,22 @@ export default function Search() {
                 <div className="info-grid">
                   <div className="info-item">
                     <span className="info-label">Inizio:</span>
-                    <span className="info-value">{formatDate(booking.startTime)}</span>
+                    <span className="info-value">{formatDate(booking.data_ora_inizio)}</span>
                   </div>
                   <div className="info-item">
                     <span className="info-label">Fine:</span>
-                    <span className="info-value">{formatDate(booking.endTime)}</span>
+                    <span className="info-value">{formatDate(booking.data_ora_fine)}</span>
                   </div>
                   <div className="info-item">
                     <span className="info-label">Creata il:</span>
-                    <span className="info-value">
-                      {new Date(booking.timestamp).toLocaleDateString('it-IT')}
-                    </span>
+                    <span className="info-value">{formatDate(booking.created_at)}</span>
                   </div>
                 </div>
               </div>
 
-              {booking.status === 'active' && (
+              {booking.stato === 'attiva' && (
                 <div className="result-actions">
-                  <button className="action-button modify">
-                    ✏️ Modifica Prenotazione
-                  </button>
-                  <button className="action-button cancel">
+                  <button className="action-button cancel" onClick={() => setShowCancelModal(true)}>
                     🗑️ Annulla Prenotazione
                   </button>
                 </div>
@@ -149,9 +157,7 @@ export default function Search() {
             </div>
 
             <div className="result-footer">
-              <p className="help-text">
-                💡 Conserva questo codice per accedere al parcheggio
-              </p>
+              <p className="help-text">💡 Conserva questo codice per accedere al parcheggio</p>
             </div>
           </div>
         )}
@@ -166,7 +172,6 @@ export default function Search() {
                 <li>Visualizza o gestisci la tua prenotazione</li>
               </ol>
             </div>
-
             <div className="help-card">
               <h3>📱 Dove trovo il codice?</h3>
               <p>
@@ -177,6 +182,27 @@ export default function Search() {
           </div>
         )}
       </div>
+
+      {/* Modal Annullamento */}
+      {showCancelModal && (
+        <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
+          <div className="modal-content small" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowCancelModal(false)}>✕</button>
+            <div className="modal-body">
+              <div className="warning-icon">⚠️</div>
+              <h3 className="modal-title">Annulla Prenotazione</h3>
+              <p className="modal-text">
+                Sei sicuro di voler annullare la prenotazione per <strong>{booking?.parcheggio_nome}</strong>?
+              </p>
+              <p className="modal-subtext">Codice: <code>{booking?.codice_prenotazione}</code></p>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-modal-cancel" onClick={() => setShowCancelModal(false)}>Chiudi</button>
+              <button className="btn-modal-confirm" onClick={handleCancel}>Conferma Annullamento</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
