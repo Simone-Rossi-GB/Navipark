@@ -95,6 +95,25 @@
   background: #0f172a;
 }
 
+/* Dark mode: pulsante resetta filtri */
+[data-theme="dark"] .reset-button {
+  background: #1e293b;
+  color: var(--text-secondary);
+  border-color: #475569;
+}
+
+[data-theme="dark"] .reset-button:hover {
+  background: #334155;
+  border-color: var(--text-secondary);
+}
+
+/* Dark mode: badge "N parcheggi disponibili" sulla mappa */
+[data-theme="dark"] .results-badge {
+  background: #1e293b;
+  color: var(--text-primary);
+  border: 1px solid #334155;
+}
+
 /* Dark mode: marker mappa */
 [data-theme="dark"] .price-tag {
   background: #1e293b;
