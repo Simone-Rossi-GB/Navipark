@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
 import { useAuth } from './hooks/useAuth'
 import Header from './components/Header'
 import Home from './pages/Home'
@@ -59,10 +60,12 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="app-wrapper">
-          <Header />
-          <AppRoutes />
-        </div>
+        <ToastProvider>
+          <div className="app-wrapper">
+            <Header />
+            <AppRoutes />
+          </div>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )
