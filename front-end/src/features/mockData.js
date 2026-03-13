@@ -187,6 +187,7 @@ export const adminStats = {
   totalBookings: 1247,
   activeBookings: 89,
   totalRevenue: 12450.50,
+  co2Saved: 324.5,
   mostUsedParkings: [
     { nome: 'Parcheggio Centro', prenotazioni: 456 },
     { nome: 'Parcheggio Stazione', prenotazioni: 389 },
