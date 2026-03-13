@@ -1377,8 +1377,15 @@
 
 .parkings-table td {
   padding: 1rem;
-  border-bottom: 1px solid var(--border-light);
   color: var(--text-primary);
+}
+
+.parkings-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.parkings-table tbody tr:last-child {
+  border-bottom: none;
 }
 
 .parkings-table tbody tr:hover {
