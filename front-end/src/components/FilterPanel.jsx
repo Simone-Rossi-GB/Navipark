@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Checkbox } from '@/components/base/checkbox/checkbox'
 
 export default function FilterPanel({ onFilterChange }) {
   const [filters, setFilters] = useState({
@@ -108,51 +109,31 @@ export default function FilterPanel({ onFilterChange }) {
       <div className="filter-section">
         <h3 className="filter-section-title">Servizi</h3>
         <div className="amenities-list">
-          <label className="amenity-checkbox">
-            <input
-              type="checkbox"
-              checked={filters.amenities.includes('videosorveglianza')}
-              onChange={() => toggleAmenity('videosorveglianza')}
-            />
-            <span className="amenity-icon">📹</span>
-            <span>Videosorveglianza</span>
-          </label>
-          <label className="amenity-checkbox">
-            <input
-              type="checkbox"
-              checked={filters.amenities.includes('disabili')}
-              onChange={() => toggleAmenity('disabili')}
-            />
-            <span className="amenity-icon">♿</span>
-            <span>Posto disabili</span>
-          </label>
-          <label className="amenity-checkbox">
-            <input
-              type="checkbox"
-              checked={filters.amenities.includes('elettrico')}
-              onChange={() => toggleAmenity('elettrico')}
-            />
-            <span className="amenity-icon">⚡</span>
-            <span>Ricarica elettrica</span>
-          </label>
-          <label className="amenity-checkbox">
-            <input
-              type="checkbox"
-              checked={filters.amenities.includes('custodito')}
-              onChange={() => toggleAmenity('custodito')}
-            />
-            <span className="amenity-icon">🔒</span>
-            <span>Custodito</span>
-          </label>
-          <label className="amenity-checkbox">
-            <input
-              type="checkbox"
-              checked={filters.amenities.includes('moto')}
-              onChange={() => toggleAmenity('moto')}
-            />
-            <span className="amenity-icon">🏍️</span>
-            <span>Posto moto</span>
-          </label>
+          <Checkbox
+            label="📹 Videosorveglianza"
+            isSelected={filters.amenities.includes('videosorveglianza')}
+            onChange={() => toggleAmenity('videosorveglianza')}
+          />
+          <Checkbox
+            label="♿ Posto disabili"
+            isSelected={filters.amenities.includes('disabili')}
+            onChange={() => toggleAmenity('disabili')}
+          />
+          <Checkbox
+            label="⚡ Ricarica elettrica"
+            isSelected={filters.amenities.includes('elettrico')}
+            onChange={() => toggleAmenity('elettrico')}
+          />
+          <Checkbox
+            label="🔒 Custodito"
+            isSelected={filters.amenities.includes('custodito')}
+            onChange={() => toggleAmenity('custodito')}
+          />
+          <Checkbox
+            label="🏍️ Posto moto"
+            isSelected={filters.amenities.includes('moto')}
+            onChange={() => toggleAmenity('moto')}
+          />
         </div>
       </div>
 
