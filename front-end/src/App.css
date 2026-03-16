@@ -440,6 +440,23 @@
   cursor: pointer;
 }
 
+.user-tag {
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-md);
+    white-space: nowrap;
+    transition: var(--transition);
+    color: var(--text-primary);
+}
+
+.user-tag:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-lg);
+}
+
 .price-tag {
   background: white;
   padding: 0.5rem 1rem;
@@ -455,6 +472,19 @@
 .price-tag:hover {
   transform: scale(1.1);
   box-shadow: var(--shadow-lg);
+}
+
+.user-dot {
+    width: 17px;
+    height: 17px;
+    background: var(--primary-blue);
+    border: 3px solid white;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: var(--shadow-sm);
 }
 
 .marker-dot {

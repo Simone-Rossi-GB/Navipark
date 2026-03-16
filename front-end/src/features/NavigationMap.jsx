@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
-import Map, { Marker, Popup, Layer } from 'react-map-gl'
+import React, {useEffect, useState} from 'react'
+import Map, { Marker, Popup, Layer, Source} from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import {useAuth} from "@/hooks/useAuth.js";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -41,17 +42,25 @@ function handleMarkerClick(parking, setShowParking) {
     // quindi dico che il valore nuovo attuale deve essere il contrario del valore attuale
 }
 
-export default function NavigationMap({ parking, mapStyle = 'streets-v12' }) {
-    const selectedParking = parking
+export default function NavigationMap({ destination, userPos, route, mapStyle = 'streets-v12' }) {
+    const { user } = useAuth()
+    const [isViewLocked, setIsViewLocked] = useState(true)
+    const selectedParking = destination
     const [showParking, setShowParking] = useState(false)
     const [mapError, setMapError] = useState(null)
     const [viewState, setViewState] = useState({
-        longitude: 10.2205,
-        latitude: 45.5397,
+        longitude: destination.lng,
+        latitude: destination.lat,
         zoom: 15.5,
         pitch: 45,
         bearing: 0
     })
+
+    useEffect(() => {
+        if(userPos && !isViewLocked) {
+            setViewState(prev => ({ ...prev, longitude: userPos.lng, latitude: userPos.lat }))
+        }
+    }, [userPos]);
 
     const handleMapError = (error) => {
         console.error('Mapbox error:', error)
@@ -84,16 +93,32 @@ export default function NavigationMap({ parking, mapStyle = 'streets-v12' }) {
             >
                 <Layer {...buildingLayer} />
 
+                {userPos && user &&
+                    <Marker
+                        key="user-position"
+                        longitude={userPos.lng}
+                        latitude={userPos.lat}
+                        anchor="bottom"
+                    >
+                        <div className="marker-container">
+                            <div className="user-dot"></div>
+                            <div className="user-tag">
+                                {user.name}
+                            </div>
+                        </div>
+                    </Marker>
+                }
+
                 {/* Marker parcheggi con prezzi */}
                 {selectedParking &&
                     <Marker
-                    key={parking.id}
-                    longitude={parking.lng}
-                    latitude={parking.lat}
+                    key={destination.id}
+                    longitude={destination.lng}
+                    latitude={destination.lat}
                     anchor="bottom"
                     onClick={(e) => {
                         e.originalEvent.stopPropagation()
-                        handleMarkerClick(parking, setShowParking)
+                        handleMarkerClick(destination, setShowParking)
                     }}
                     >
 
