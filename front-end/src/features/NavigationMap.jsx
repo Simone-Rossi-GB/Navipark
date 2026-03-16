@@ -60,7 +60,7 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
         if(userPos && !isViewLocked) {
             setViewState(prev => ({ ...prev, longitude: userPos.lng, latitude: userPos.lat }))
         }
-    }, [userPos]);
+    }, [userPos, isViewLocked]);
 
     const handleMapError = (error) => {
         console.error('Mapbox error:', error)
@@ -92,6 +92,16 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
                 mapboxAccessToken={MAPBOX_TOKEN}
             >
                 <Layer {...buildingLayer} />
+
+                {route && (
+                    <Source id="route" type="geojson" data={route}>
+                        <Layer
+                            id="route-line"
+                            type="line"
+                            paint={{'line-color': '#3b82f6', 'line-width': 5}}
+                        />
+                    </Source>
+                )}
 
                 {userPos && user &&
                     <Marker
@@ -159,6 +169,12 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
                     </Popup>
                 )}
             </Map>
+            <button
+                style={{ position: 'absolute', bottom: '1rem', right: '1rem', zIndex: 10 }}
+                onClick={() => setIsViewLocked(prev => !prev)}
+            >
+                {isViewLocked ? 'segui posizione: ON' : 'segui posizione: OFF'}
+            </button>
         </div>
     )
 }
