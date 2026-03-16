@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 export default function ParkingCard({ parking }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="border p-4 rounded shadow-sm bg-white">
@@ -10,7 +10,7 @@ export default function ParkingCard({ parking }) {
       <p className="mt-2">Posti liberi: <strong>{parking.freeSpots}</strong> / {parking.totalSpots}</p>
       <p>Prezzo: €{parking.price}</p>
       <div className="mt-4">
-        <button onClick={() => setOpen(true)} className="bg-green-600 text-white px-3 py-1 rounded">Prenota</button>
+        <button onClick={() => setOpen(true)} className="bg-green-300 text-white px-3 py-1 rounded">Prenota</button>
       </div>
       {/* Solo UI, nessuna logica backend */}
       {open && (

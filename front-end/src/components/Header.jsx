@@ -61,6 +61,12 @@ export default function Header() {
             <span className="nav-icon">🔍️</span>
             <span>Cerca prenotazione</span>
           </NavLink>
+            {user && (
+                <NavLink to="/navigator" className="nav-link">
+                    <span className="nav-icon">🧭</span>
+                    <span>Navigatore</span>
+                </NavLink>
+            )}
           {user && isAdmin() && (
             <NavLink to="/admin" className="nav-link">
               <span className="nav-icon">📊</span>

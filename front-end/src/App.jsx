@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext'
 import { useAuth } from './hooks/useAuth'
 import Header from './components/Header'
 import Home from './pages/Home'
+import Navigator from './pages/Navigator'
 import Login from './pages/Login'
 import Search from './pages/Search'
 import AdminDashboard from './pages/AdminDashboard'
@@ -35,6 +36,14 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       {/* Search è PUBBLICA - chiunque può cercare una prenotazione */}
       <Route path="/search" element={<Search />} />
+      <Route
+        path="/navigator"
+        element={
+          <ProtectedRoute>
+              <Navigator />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/profile"
         element={

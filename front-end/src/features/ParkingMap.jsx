@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import Map, { Marker, Popup, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import {useAuth} from "@/hooks/useAuth.js";
+import {useNavigate} from "react-router-dom";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -46,7 +48,9 @@ export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'stree
     zoom: 15.5,
     pitch: 45,
     bearing: 0
-  })
+  });
+  const { user } = useAuth();
+  const navigate = useNavigate()
 
   const handleMarkerClick = (parking) => {
     setSelectedParking(parking)
@@ -137,6 +141,9 @@ export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'stree
               >
                 Prenota ora
               </button>
+                { user &&
+                    <button onClick={() => navigate('/navigator', {state: { parking: selectedParking } })} className="popup-button">Vai qui</button>
+                }
             </div>
           </Popup>
         )}
