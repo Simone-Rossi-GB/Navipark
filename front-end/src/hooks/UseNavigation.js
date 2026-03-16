@@ -43,7 +43,7 @@ export function useNavigation() {
 
 async function fetchRoute(from, to) {
     const token = import.meta.env.VITE_MAPBOX_TOKEN
-    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${from.lng},${from.lat};${to.lng},${to.lat}?geometries=geojson&access_token=${token}`
+    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${from.lng},${from.lat};${to.lng},${to.lat}?geometries=geojson&overview=full&access_token=${token}`
     const res = await fetch(url)
     const data = await res.json()
     console.log(data.routes?.[0] ?? "data routes non visibile")
