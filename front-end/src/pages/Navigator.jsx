@@ -10,14 +10,14 @@ export default function Navigator() {
     const mapStyle= 'streets-v12'
     const location = useLocation()
     const parking = location.state?.parking
-    const [selectedParking, setSelectedParking] = useState(parking)
     const { userPosition, route, isNavigating, startNavigation, stopNavigation } = useNavigation()
 
     useEffect(() => {
-        if (selectedParking) {
-            startNavigation(selectedParking)
+        if (parking) {
+            startNavigation(parking)
         }
-    }, [selectedParking])
+        return () => stopNavigation()
+    }, [parking])
 
     return (
         <div className="home-container">
@@ -31,8 +31,8 @@ export default function Navigator() {
                         <p>scegliere la destinazione dal menù laterale, dalla prenotazione o dalla mappa scegliendo un parcheggio</p>
                     </div>
                 }
-                {user && selectedParking && <NavigationMap
-                    destination={selectedParking}
+                {user && parking && <NavigationMap
+                    destination={parking}
                     userPos={userPosition}
                     route={route}
                     mapStyle={mapStyle}

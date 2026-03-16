@@ -474,6 +474,36 @@
   box-shadow: var(--shadow-lg);
 }
 
+.nav-lock-button {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    border: 1.5px solid var(--border-light);
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.nav-lock-button:hover {
+    background: var(--border-light);
+}
+
+.nav-lock-button.active {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: #fff;
+}
+
 .user-dot {
     width: 17px;
     height: 17px;

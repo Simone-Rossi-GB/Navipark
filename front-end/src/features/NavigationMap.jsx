@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import Map, { Marker, Popup, Layer, Source} from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import {useAuth} from "@/hooks/useAuth.js";
+import MAth from "decimal.js";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -37,6 +38,12 @@ const buildingLayer = {
     }
 }
 
+function calculateBearing(from, to) {
+    const dLng = to.lng - from.lng
+    const dLat = to.lat - from.lat
+    return (MAth.atan2(dLng, dLat) * (180 / Math.PI) + 360) % 360
+}
+
 function handleMarkerClick(parking, setShowParking) {
     setShowParking(prev => !prev) // prev è il valore attuale di show parking.
     // quindi dico che il valore nuovo attuale deve essere il contrario del valore attuale
@@ -46,6 +53,7 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
     const { user } = useAuth()
     const [isViewLocked, setIsViewLocked] = useState(true)
     const selectedParking = destination
+    const prevUserPosRef = useRef(null)
     const [showParking, setShowParking] = useState(false)
     const [mapError, setMapError] = useState(null)
     const [viewState, setViewState] = useState({
@@ -57,8 +65,16 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
     })
 
     useEffect(() => {
-        if(userPos && !isViewLocked) {
-            setViewState(prev => ({ ...prev, longitude: userPos.lng, latitude: userPos.lat }))
+        if(userPos && isViewLocked) {
+            const bearing = prevUserPosRef.current ? calculateBearing(prevUserPosRef.current, userPos) : 0
+            prevUserPosRef.current = userPos
+
+            setViewState(prev => ({
+                ...prev,
+                longitude: userPos.lng,
+                latitude: userPos.lat,
+                bearing: bearing,
+                pitch: 60}))
         }
     }, [userPos, isViewLocked]);
 
@@ -170,10 +186,10 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
                 )}
             </Map>
             <button
-                style={{ position: 'absolute', bottom: '1rem', right: '1rem', zIndex: 10 }}
+                className={`nav-lock-button ${isViewLocked ? 'active' : ''}`}
                 onClick={() => setIsViewLocked(prev => !prev)}
             >
-                {isViewLocked ? 'segui posizione: ON' : 'segui posizione: OFF'}
+                {isViewLocked ? '⬤ Segui posizione' : '○ Segui posizione'}
             </button>
         </div>
     )
