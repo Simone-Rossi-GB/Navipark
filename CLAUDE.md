@@ -57,7 +57,7 @@ utils/
 ## Convenzioni commit
 I messaggi di fix iniziano con `FIX:`. I messaggi informativi con `INFO:`. Commit normali con descrizione italiana concisa.
 
-Sempre: `Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>` in fondo al commit.
+Mai inserire: `Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>` o simili in fondo al commit.
 
 ## Cosa è stato fatto (sessioni precedenti)
 - Copia di tutti i file dalla cartella scaricata al progetto, con commit per ogni file
