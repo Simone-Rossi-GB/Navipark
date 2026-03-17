@@ -117,7 +117,7 @@ export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'stree
             anchor="bottom"
             onClose={() => setSelectedParking(null)}
             closeButton={true}
-            closeOnClick={false}
+            closeOnClick={true}
             offset={25}
           >
             <div className="parking-popup">

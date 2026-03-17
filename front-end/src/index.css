@@ -130,6 +130,11 @@
   background: #1e293b;
 }
 
+[data-theme="dark"] .stat-card.green .stat-value,
+[data-theme="dark"] .stat-card.green .stat-label {
+  color: #6ee7b7;
+}
+
 [data-theme="dark"] .type-button,
 [data-theme="dark"] .spot-button,
 [data-theme="dark"] .style-select,

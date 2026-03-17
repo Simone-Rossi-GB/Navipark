@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Checkbox } from '@/components/base/checkbox/checkbox'
 
-export default function FilterPanel({ onFilterChange }) {
+export default function FilterPanel({ onFilterChange, searchQuery = '', onSearchChange }) {
   const [filters, setFilters] = useState({
     type: 'all',
     priceRange: [0, 5],
@@ -40,6 +40,17 @@ export default function FilterPanel({ onFilterChange }) {
 
   return (
     <div className="filter-panel">
+      {/* Ricerca per nome/indirizzo */}
+      <div className="filter-section">
+        <input
+          type="text"
+          placeholder="Cerca parcheggio o indirizzo..."
+          value={searchQuery}
+          onChange={e => onSearchChange && onSearchChange(e.target.value)}
+          className="search-input"
+        />
+      </div>
+
       {/* Tipo Parcheggio */}
       <div className="filter-section">
         <h3 className="filter-section-title">Tipo Parcheggio</h3>

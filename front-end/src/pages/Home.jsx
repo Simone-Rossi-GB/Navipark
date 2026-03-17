@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../context/ToastContext'
+import { useTheme } from '../context/ThemeContext'
 import ParkingMap from '../features/ParkingMap'
 import FilterPanel from '../components/FilterPanel'
 import * as api from '../services/api'
@@ -13,6 +14,7 @@ const TARGA_REGEX = /^[A-Z]{2}[0-9]{3}[A-Z]{2}$/
 export default function Home() {
   const { user } = useAuth()
   const { addToast } = useToast()
+  const { darkMode } = useTheme()
   const navigate = useNavigate()
 
   const [parkings, setParkings] = useState([])
@@ -22,7 +24,10 @@ export default function Home() {
     minFreeSpots: 0,
     amenities: []
   })
-  const [mapStyle, setMapStyle] = useState('streets-v12')
+  const [mapStyle, setMapStyle] = useState(() =>
+    localStorage.getItem('theme') === 'dark' ? 'dark-v11' : 'streets-v12'
+  )
+  const [searchQuery, setSearchQuery] = useState('')
   const [selectedParking, setSelectedParking] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [bookingData, setBookingData] = useState({ targa: '', startDate: '', startHour: '', duration: 2 })
@@ -36,8 +41,18 @@ export default function Home() {
     })
   }, [])
 
+  useEffect(() => {
+    setMapStyle(prev => {
+      if (darkMode && !prev.startsWith('dark')) return 'dark-v11'
+      if (!darkMode && prev === 'dark-v11') return 'streets-v12'
+      return prev
+    })
+  }, [darkMode])
+
   const filteredParkings = useMemo(() => {
+    const q = searchQuery.toLowerCase()
     return parkings.filter(p => {
+      if (q && !p.nome?.toLowerCase().includes(q) && !p.indirizzo?.toLowerCase().includes(q)) return false
       if (filters.type !== 'all' && p.tipo !== filters.type) return false
       if (p.tariffa_oraria > filters.priceRange[1]) return false
       if (p.posti_liberi < filters.minFreeSpots) return false
@@ -46,7 +61,7 @@ export default function Home() {
       }
       return true
     })
-  }, [filters, parkings])
+  }, [filters, parkings, searchQuery])
 
   const handleParkingClick = (parking) => {
     if (!user) { navigate('/login'); return }
@@ -128,7 +143,7 @@ export default function Home() {
   return (
     <div className="home-container">
       <aside className="sidebar">
-        <FilterPanel onFilterChange={setFilters} />
+        <FilterPanel onFilterChange={setFilters} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
         <div className="map-style-selector">
           <h3 className="filter-section-title">Stile Mappa</h3>
           <select value={mapStyle} onChange={e => setMapStyle(e.target.value)} className="style-select">
