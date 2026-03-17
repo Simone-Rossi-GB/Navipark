@@ -4,6 +4,8 @@ export function useNavigation() {
     const [userPosition, setUserPosition] = useState(null)
     const [route, setRoute] = useState(null)
     const [distance, setDistance] = useState(null)
+    const [duration, setDuration] = useState(null)
+    const [ETA, setETA] = useState("-")
     const [isNavigating, setIsNavigating] = useState(false)
     const watchIDref = useRef(null) // id ref all'istanza di geolocalizzazione dell'utente via browser
 
@@ -21,6 +23,22 @@ export function useNavigation() {
                 if (newRoute) {
                     setRoute(newRoute.geometry)
                     setDistance(newRoute.distance / 1000) // km
+                    setDuration(newRoute.duration)
+                    setETA(new Date(Date.now() + duration * 1000).toLocaleTimeString(
+                        'it-IT',
+                        {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }))
+                    console.log("duration newRoute: ", newRoute.duration)
+                    console.log("duration: ", duration)
+                    console.log("ETA date: ", new Date(Date.now() + duration * 1000).toLocaleTimeString(
+                        'it-IT',
+                        {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }))
+                    console.log("ETA: ", ETA)
                 }
             },
             (err) => console.error('Errore del GPS dio smutandato: ', err),
@@ -36,9 +54,11 @@ export function useNavigation() {
         setRoute(null)
         setUserPosition(null)
         setDistance(null)
+        setDuration(null)
+        setETA("-")
     }
 
-    return { userPosition, route, distance, isNavigating, startNavigation, stopNavigation}
+    return { userPosition, route, distance, ETA, isNavigating, startNavigation, stopNavigation}
 }
 
 async function fetchRoute(from, to) {

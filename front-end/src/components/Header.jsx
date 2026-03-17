@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useTheme } from '../context/ThemeContext'
 import * as api from '../services/api'
 
 export default function Header() {
   const { user, logout, isAdmin } = useAuth()
+  const { darkMode, toggleDarkMode } = useTheme()
   const [showMenu, setShowMenu] = useState(false)
   const [activeBookings, setActiveBookings] = useState(0)
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark')
   const navigate = useNavigate()
   const menuRef = useRef(null)
 
@@ -20,12 +21,6 @@ export default function Header() {
       }
     })
   }, [user])
-
-  // Applica/rimuovi dark mode
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light')
-  }, [darkMode])
 
   // Chiudi menu cliccando fuori
   useEffect(() => {
@@ -79,7 +74,7 @@ export default function Header() {
           {/* Toggle Dark Mode */}
           <button
             className="theme-toggle"
-            onClick={() => setDarkMode(d => !d)}
+            onClick={toggleDarkMode}
             title={darkMode ? 'Passa alla modalità chiara' : 'Passa alla modalità scura'}
           >
             {darkMode ? '☀️' : '🌙'}

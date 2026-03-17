@@ -48,6 +48,8 @@ export default function AdminDashboard() {
   const [parkingForm, setParkingForm] = useState(EMPTY_PARKING_FORM)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [parkingToDelete, setParkingToDelete] = useState(null)
+  const [geoQuery, setGeoQuery] = useState('')
+  const [geoLoading, setGeoLoading] = useState(false)
 
   // ── Prenotazioni ──
   const [bookings, setBookings] = useState([])
@@ -69,6 +71,7 @@ export default function AdminDashboard() {
   const handleAddParking = () => {
     setEditingParking(null)
     setParkingForm(EMPTY_PARKING_FORM)
+    setGeoQuery('')
     setShowParkingModal(true)
   }
 
@@ -82,6 +85,7 @@ export default function AdminDashboard() {
       servizi: p.servizi || [],
       image: p.image || EMPTY_PARKING_FORM.image
     })
+    setGeoQuery('')
     setShowParkingModal(true)
   }
 
@@ -117,6 +121,27 @@ export default function AdminDashboard() {
       }
     }
     setShowParkingModal(false)
+  }
+
+  const handleGeocode = async () => {
+    if (!geoQuery.trim()) return
+    setGeoLoading(true)
+    const token = import.meta.env.VITE_MAPBOX_TOKEN
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(geoQuery)}.json?country=it&proximity=10.2205,45.5397&access_token=${token}`
+    try {
+      const res = await fetch(url)
+      const data = await res.json()
+      if (data.features?.length > 0) {
+        const [lng, lat] = data.features[0].center
+        setParkingForm(prev => ({ ...prev, lat, lng }))
+        addToast('Posizione trovata', 'success')
+      } else {
+        addToast('Indirizzo non trovato', 'error')
+      }
+    } catch {
+      addToast('Errore durante la geocodifica', 'error')
+    }
+    setGeoLoading(false)
   }
 
   const toggleServizio = (s) => {
@@ -424,7 +449,7 @@ export default function AdminDashboard() {
       {/* Modal Aggiungi/Modifica Parcheggio */}
       {showParkingModal && (
         <div className="modal-overlay" onClick={() => setShowParkingModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-content large" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setShowParkingModal(false)}>✕</button>
             <h2 className="modal-title" style={{ padding: '1.5rem 1.5rem 0' }}>
               {editingParking ? '✏️ Modifica Parcheggio' : '➕ Nuovo Parcheggio'}
@@ -469,16 +494,32 @@ export default function AdminDashboard() {
                     onChange={e => setParkingForm({ ...parkingForm, tariffa_oraria: parseFloat(e.target.value) })} />
                 </div>
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Latitudine *</label>
-                  <input type="number" required step="0.0001" value={parkingForm.lat} className="form-input"
-                    onChange={e => setParkingForm({ ...parkingForm, lat: parseFloat(e.target.value) })} />
+              <div className="form-group">
+                <label>Posizione sulla mappa</label>
+                <div className="form-row" style={{ gap: '0.5rem' }}>
+                  <input
+                    type="text"
+                    placeholder="Cerca indirizzo per aggiornare la posizione..."
+                    value={geoQuery}
+                    onChange={e => setGeoQuery(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleGeocode())}
+                    className="form-input"
+                  />
+                  <button type="button" onClick={handleGeocode} className="btn-save" style={{ whiteSpace: 'nowrap' }} disabled={geoLoading}>
+                    {geoLoading ? '...' : '📍 Cerca'}
+                  </button>
                 </div>
-                <div className="form-group">
-                  <label>Longitudine *</label>
-                  <input type="number" required step="0.0001" value={parkingForm.lng} className="form-input"
-                    onChange={e => setParkingForm({ ...parkingForm, lng: parseFloat(e.target.value) })} />
+                <div className="form-row" style={{ marginTop: '0.5rem', gap: '0.5rem' }}>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Lat</label>
+                    <input type="number" required step="0.0001" value={parkingForm.lat} className="form-input"
+                      onChange={e => setParkingForm({ ...parkingForm, lat: parseFloat(e.target.value) })} />
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Lng</label>
+                    <input type="number" required step="0.0001" value={parkingForm.lng} className="form-input"
+                      onChange={e => setParkingForm({ ...parkingForm, lng: parseFloat(e.target.value) })} />
+                  </div>
                 </div>
               </div>
               <div className="form-group">
@@ -527,7 +568,7 @@ export default function AdminDashboard() {
       {/* Modal Aggiungi/Modifica Prenotazione */}
       {showBookingModal && (
         <div className="modal-overlay" onClick={() => setShowBookingModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-content large" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setShowBookingModal(false)}>✕</button>
             <h2 className="modal-title" style={{ padding: '1.5rem 1.5rem 0' }}>
               {editingBooking ? '✏️ Modifica Prenotazione' : '➕ Nuova Prenotazione'}
