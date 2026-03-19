@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { useAuth } from './hooks/useAuth'
 import Header from './components/Header'
+import BottomNav from './components/BottomNav'
 import Home from './pages/Home'
 import Navigator from './pages/Navigator'
 import Login from './pages/Login'
@@ -75,6 +76,7 @@ export default function App() {
             <div className="app-wrapper">
               <Header />
               <AppRoutes />
+              <BottomNav />
             </div>
           </ToastProvider>
         </ThemeProvider>

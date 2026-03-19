@@ -3,6 +3,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { useToast } from '../context/ToastContext'
 import * as api from '../services/api'
 import { Checkbox } from '@/components/base/checkbox/checkbox'
+import {
+  LayoutDashboard, ParkingSquare, CalendarDays, Plus, Pencil, Trash2,
+  Trophy, ChevronDown, ChevronUp, BarChart3, Leaf, BadgeCheck, Wallet
+} from 'lucide-react'
 
 const EMPTY_PARKING_FORM = {
   nome: '',
@@ -60,6 +64,8 @@ export default function AdminDashboard() {
   const [bookingFormErrors, setBookingFormErrors] = useState({})
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [bookingToCancel, setBookingToCancel] = useState(null)
+  const [expandedParkingId, setExpandedParkingId] = useState(null)
+  const [expandedBookingId, setExpandedBookingId] = useState(null)
 
   useEffect(() => {
     api.getParcheggi().then(res => { if (res.success) setParkings(res.data) })
@@ -265,7 +271,7 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <div className="admin-header">
-        <h1 className="admin-title">📊 Dashboard Amministratore</h1>
+        <h1 className="admin-title"><LayoutDashboard size={24} /> Dashboard Amministratore</h1>
         <p className="admin-subtitle">Gestisci parcheggi, prenotazioni e visualizza statistiche</p>
       </div>
 
@@ -273,31 +279,31 @@ export default function AdminDashboard() {
       {stats && (
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon">📋</div>
+            <div className="stat-icon"><CalendarDays size={28} /></div>
             <div className="stat-content">
               <div className="stat-value">{stats.totalBookings.toLocaleString()}</div>
               <div className="stat-label">Prenotazioni Totali</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">✅</div>
+            <div className="stat-icon"><BadgeCheck size={28} /></div>
             <div className="stat-content">
               <div className="stat-value">{stats.activeBookings}</div>
               <div className="stat-label">Prenotazioni Attive</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">💰</div>
+            <div className="stat-icon"><Wallet size={28} /></div>
             <div className="stat-content">
               <div className="stat-value">€{stats.totalRevenue.toLocaleString()}</div>
               <div className="stat-label">Ricavi Totali</div>
             </div>
           </div>
           <div className="stat-card green" title="Stima: ogni prenotazione in un parcheggio gestito evita ~0.24 kg CO₂ rispetto a cercare parcheggio in giro per la città">
-            <div className="stat-icon">🌱</div>
+            <div className="stat-icon"><Leaf size={28} /></div>
             <div className="stat-content">
               <div className="stat-value">{stats.co2Saved} kg</div>
-              <div className="stat-label">CO₂ Risparmiata ℹ️</div>
+              <div className="stat-label">CO₂ Risparmiata</div>
             </div>
           </div>
         </div>
@@ -306,7 +312,7 @@ export default function AdminDashboard() {
       {/* Parcheggi più utilizzati */}
       {stats?.mostUsedParkings && (
         <div className="top-parkings">
-          <h2 className="section-title">🏆 Parcheggi Più Utilizzati</h2>
+          <h2 className="section-title"><Trophy size={18} /> Parcheggi Più Utilizzati</h2>
           <div className="top-list">
             {stats.mostUsedParkings.map((p, i) => (
               <div key={i} className="top-item">
@@ -325,13 +331,13 @@ export default function AdminDashboard() {
           className={`admin-tab${activeTab === 'parcheggi' ? ' active' : ''}`}
           onClick={() => setActiveTab('parcheggi')}
         >
-          🅿️ Parcheggi
+          <ParkingSquare size={16} /> Parcheggi
         </button>
         <button
           className={`admin-tab${activeTab === 'prenotazioni' ? ' active' : ''}`}
           onClick={() => setActiveTab('prenotazioni')}
         >
-          📋 Prenotazioni
+          <CalendarDays size={16} /> Prenotazioni
           {bookings.filter(b => b.stato === 'attiva').length > 0 && (
             <span className="tab-badge">{bookings.filter(b => b.stato === 'attiva').length}</span>
           )}
@@ -343,8 +349,35 @@ export default function AdminDashboard() {
         <div className="parkings-crud">
           <div className="crud-header">
             <h2 className="section-title">Gestione Parcheggi</h2>
-            <button className="btn-add" onClick={handleAddParking}>➕ Aggiungi Parcheggio</button>
+            <button className="btn-add" onClick={handleAddParking}><Plus size={16} /> Aggiungi Parcheggio</button>
           </div>
+          {/* Lista mobile parcheggi */}
+          <div className="admin-mobile-list">
+            {parkings.map(p => {
+              const open = expandedParkingId === p.id
+              return (
+                <div key={p.id} className="admin-card-item">
+                  <div className="admin-card-header" onClick={() => setExpandedParkingId(open ? null : p.id)}>
+                    <span className="admin-card-title">{p.nome}</span>
+                    <span className={`type-badge ${p.tipo}`}>{p.tipo === 'coperto' ? 'Coperto' : 'Scoperto'}</span>
+                    {open ? <ChevronUp size={16} className="admin-card-chevron" /> : <ChevronDown size={16} className="admin-card-chevron" />}
+                  </div>
+                  {open && (
+                    <div className="admin-card-body">
+                      <div className="admin-card-row"><span>Indirizzo</span><span>{p.indirizzo}</span></div>
+                      <div className="admin-card-row"><span>Posti liberi</span><span className={p.posti_liberi < 10 ? 'text-red' : 'text-green'}>{p.posti_liberi}/{p.capacita_totale}</span></div>
+                      <div className="admin-card-row"><span>Tariffa</span><span>€{p.tariffa_oraria.toFixed(2)}/h</span></div>
+                      <div className="admin-card-actions">
+                        <button className="btn-edit" onClick={() => handleEditParking(p)}><Pencil size={14} /> Modifica</button>
+                        <button className="btn-delete" onClick={() => { setParkingToDelete(p); setShowDeleteModal(true) }}><Trash2 size={14} /> Elimina</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
           <div className="parkings-table">
             <table>
               <thead>
@@ -374,8 +407,8 @@ export default function AdminDashboard() {
                     </td>
                     <td>€{p.tariffa_oraria.toFixed(2)}/h</td>
                     <td className="actions">
-                      <button className="btn-edit" onClick={() => handleEditParking(p)} title="Modifica">✏️</button>
-                      <button className="btn-delete" onClick={() => { setParkingToDelete(p); setShowDeleteModal(true) }} title="Elimina">🗑️</button>
+                      <button className="btn-edit" onClick={() => handleEditParking(p)} title="Modifica"><Pencil size={14} /></button>
+                      <button className="btn-delete" onClick={() => { setParkingToDelete(p); setShowDeleteModal(true) }} title="Elimina"><Trash2 size={14} /></button>
                     </td>
                   </tr>
                 ))}
@@ -402,9 +435,42 @@ export default function AdminDashboard() {
                   <option key={p.id} value={p.id}>{p.nome}</option>
                 ))}
               </select>
-              <button className="btn-add" onClick={handleAddBooking}>➕ Nuova Prenotazione</button>
+              <button className="btn-add" onClick={handleAddBooking}><Plus size={16} /> Nuova Prenotazione</button>
             </div>
           </div>
+          {/* Lista mobile prenotazioni */}
+          <div className="admin-mobile-list">
+            {filteredBookings.length === 0 && (
+              <p style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Nessuna prenotazione trovata</p>
+            )}
+            {filteredBookings.map(b => {
+              const open = expandedBookingId === b.id
+              return (
+                <div key={b.id} className="admin-card-item">
+                  <div className="admin-card-header" onClick={() => setExpandedBookingId(open ? null : b.id)}>
+                    <span className="admin-card-title">{b.codice_prenotazione}</span>
+                    {statusBadge(b.stato)}
+                    {open ? <ChevronUp size={16} className="admin-card-chevron" /> : <ChevronDown size={16} className="admin-card-chevron" />}
+                  </div>
+                  {open && (
+                    <div className="admin-card-body">
+                      <div className="admin-card-row"><span>Parcheggio</span><span>{b.parcheggio_nome}</span></div>
+                      <div className="admin-card-row"><span>Targa</span><span><strong>{b.targa}</strong></span></div>
+                      <div className="admin-card-row"><span>Inizio</span><span>{formatDT(b.data_ora_inizio)}</span></div>
+                      <div className="admin-card-row"><span>Fine</span><span>{formatDT(b.data_ora_fine)}</span></div>
+                      {b.stato === 'attiva' && (
+                        <div className="admin-card-actions">
+                          <button className="btn-edit" onClick={() => handleEditBooking(b)}><Pencil size={14} /> Modifica</button>
+                          <button className="btn-delete" onClick={() => { setBookingToCancel(b); setShowCancelModal(true) }}>🚫 Annulla</button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
           <div className="parkings-table">
             <table>
               <thead>
@@ -433,7 +499,7 @@ export default function AdminDashboard() {
                     <td className="actions">
                       {b.stato === 'attiva' && (
                         <>
-                          <button className="btn-edit" onClick={() => handleEditBooking(b)} title="Modifica">✏️</button>
+                          <button className="btn-edit" onClick={() => handleEditBooking(b)} title="Modifica"><Pencil size={14} /></button>
                           <button className="btn-delete" onClick={() => { setBookingToCancel(b); setShowCancelModal(true) }} title="Annulla prenotazione">🚫</button>
                         </>
                       )}

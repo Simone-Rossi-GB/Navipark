@@ -185,7 +185,7 @@
 }
 
 .sidebar {
-  width: 360px;
+  width: clamp(280px, 28vw, 360px);
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border-light);
   overflow-y: auto;
@@ -591,9 +591,16 @@
   color: var(--text-muted);
 }
 
+.popup-buttons {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1rem 1rem;
+  flex-wrap: wrap;
+}
+
 .popup-button {
-  width: calc(50% - 2rem);
-  margin: 0 1rem 1rem;
+  flex: 1;
+  min-width: 0;
   padding: 0.75rem;
   background: var(--primary-blue);
   color: white;
@@ -1042,6 +1049,8 @@
 
 .search-input {
   flex: 1;
+  width: 100%;
+  box-sizing: border-box;
   padding: 1rem 1.25rem;
   border: 2px solid var(--border-medium);
   border-radius: var(--radius-md);
@@ -1688,6 +1697,7 @@
 .profile-header {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 1.5rem;
   background: white;
   padding: 2rem;
@@ -1880,6 +1890,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border-light);
@@ -2221,17 +2233,39 @@
 
 .nav-bottom-panel {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  top: 1rem;
+  right: 1rem;
+  left: auto;
+  bottom: auto;
   z-index: 10;
   display: flex;
   align-items: center;
+  gap: 2rem;
+  padding: 0.625rem 1.5rem;
+  background: var(--bg-sidebar);
+  border: 1.5px solid var(--border-light);
+  border-radius: 9999px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Wrapper flexbox nel nuovo JSX Navigator */
+.nav-bottom-stats {
+  display: flex;
+  align-items: center;
   gap: 1rem;
-  padding: 0.875rem 1.25rem;
-  background: var(--bg-main);
-  border-top: 1px solid var(--border-light);
-  box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
+  flex: 1;
+}
+
+.nav-bottom-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-bottom-divider {
+  display: none; /* visibile solo mobile via @media */
 }
 
 .nav-bottom-stat {
@@ -2291,34 +2325,572 @@
   border-color: #f87171;
 }
 
-/* ==================== RESPONSIVE ====================
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
-  .home-container {
-    flex-direction: column;
-  }
 
-  .sidebar {
-    width: 100%;
-    max-height: 40vh;
-  }
-
+  /* ----- Header ----- */
   .header-content {
     padding: 0.625rem 1rem;
+    gap: 0.5rem;
   }
 
-  .logo-text {
-    display: none;
+  .logo-text { display: none; }
+
+  /* Nasconde le label testuali nei link nav, restano solo le icone */
+  .nav-link span:not(.nav-icon) { display: none; }
+
+  /* Nasconde nome utente, freccia e testo "Accedi" */
+  .user-name,
+  .user-arrow { display: none; }
+
+  .login-link span:not(.login-icon) { display: none; }
+
+  /* Riduce padding link nav per compattare */
+  .nav-link {
+    padding: 0.5rem 0.625rem;
   }
 
-  .nav-link span:not(.nav-icon) {
-    display: none;
+  /* ----- Layout principale (Home + Navigator) ----- */
+  /* Su mobile la mappa occupa tutto lo schermo, la sidebar è un overlay */
+  .home-container {
+    flex-direction: row;
+    height: 100vh;
+    position: relative;
   }
 
-  .user-name {
-    display: none;
+  .map-main {
+    width: 100%;
+    height: 100%;
   }
 
+  /* Sidebar: bottom sheet che fluttua sopra la mappa */
+  .sidebar {
+    position: fixed;
+    bottom: 74px;    /* sopra la bottom nav */
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 80vh;
+    height: auto;
+    border-right: none;
+    border-top: 1.5px solid var(--border-light);
+    border-radius: 1.25rem 1.25rem 0 0;
+    box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.18);
+    z-index: 40;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* ----- Filter panel ----- */
+  .filter-panel {
+    padding: 1rem;
+  }
+
+  /* 3 bottoni tipo → 2 colonne su mobile */
   .filter-type-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* ----- Badge "N parcheggi" sulla mappa ----- */
+  .results-badge {
+    top: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* ----- Pulsante "segui posizione" navigator ----- */
+  /* Alza il bottone per non sovrapporsi al bottom panel */
+  .nav-lock-button {
+    bottom: 6rem;
+  }
+
+  /* ----- Admin dashboard ----- */
+  .admin-dashboard {
+    padding: 1rem;
+  }
+
+  .admin-title {
+    font-size: 1.5rem;
+  }
+
+  .parkings-crud,
+  .top-parkings {
+    padding: 1rem;
+  }
+
+  .crud-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .crud-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  /* Tab scrollabili orizzontalmente se non ci stanno */
+  .admin-tabs {
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  /* ----- Modal ----- */
+  .modal-overlay {
+    padding: 0.5rem;
+    align-items: flex-end;  /* su mobile il modal sale dal basso */
+  }
+
+  .modal-content,
+  .modal-content.large {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  /* ----- Profile ----- */
+  .profile-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .data-label {
+    min-width: 90px;
+  }
+
+  /* ----- Prenotazioni (profilo utente) ----- */
+  .booking-result {
+    padding: 1rem;
+  }
+
+  /* ----- Navigator bottom panel ----- */
+  .nav-bottom-panel {
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .nav-bottom-value {
+    font-size: 0.875rem;
+  }
+
+  /* Bottone stop più compatto su mobile */
+  .nav-stop-button {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ==================== BOTTOM NAV (mobile) ==================== */
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Mostra bottom nav, nascondi header-nav */
+  .bottom-nav {
+    display: block;
+  }
+
+  .header-nav {
+    display: none;
+  }
+
+  /* Spazio sotto le pagine per non finire sotto la bottom nav */
+  /* home-container escluso: la mappa è full screen, overflow non c'è */
+  .admin-dashboard,
+  .profile-page,
+  .bookings-page {
+    padding-bottom: 90px;
+  }
+
+  /* Stats admin: forza 2 colonne su mobile */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  .stat-icon {
+    font-size: 1.75rem;
+  }
+}
+
+/* Bottom nav bar: pill fluttuante */
+.bottom-nav-bar {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-light);
+  border-radius: 9999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 9999px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  font-size: 0.65rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.bottom-nav-item:hover {
+  background: var(--bg-main);
+  color: var(--primary-blue);
+}
+
+.bottom-nav-item.active {
+  background: var(--primary-blue);
+  color: white;
+}
+
+/* Dark mode bottom nav */
+[data-theme="dark"] .bottom-nav-bar {
+  background: rgba(30, 41, 59, 0.92);
+  border-color: #334155;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Nascondi header su mobile (sostituito dalla bottom nav) */
+@media (max-width: 768px) {
+  .header { display: none; }
+
+  /* Sidebar nascosta di default su mobile (vale per Home e Navigator) */
+  .sidebar-hidden { display: none !important; }
+
+  /* Pulsante toggle sidebar — si usa in Home e Navigator */
+  .nav-sidebar-toggle {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.875rem;
+    background: var(--bg-sidebar);
+    border: 1.5px solid var(--border-light);
+    border-radius: 9999px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  /* Card espandibile admin — nasconde la tabella, mostra lista */
+  .parkings-table table { display: none; }
+  .admin-mobile-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  /* Padding bottom pagine per bottom nav */
+  .admin-dashboard { padding-bottom: 100px; }
+}
+
+/* Desktop: nascondi elementi solo-mobile */
+@media (min-width: 769px) {
+  .admin-mobile-list  { display: none; }
+  .nav-sidebar-toggle { display: none; }
+}
+
+/* Card admin mobile */
+.admin-card-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  gap: 0.5rem;
+}
+
+.admin-card-header:hover { background: var(--bg-main); }
+
+.admin-card-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-card-chevron {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.admin-card-chevron.open { transform: rotate(180deg); }
+
+.admin-card-body {
+  padding: 0.875rem 1rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--bg-main);
+}
+
+.admin-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.admin-card-row span:first-child { color: var(--text-secondary); }
+.admin-card-row span:last-child { font-weight: 500; color: var(--text-primary); }
+
+.admin-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+/* ==================== SIDEBAR MOBILE MIGLIORAMENTI ==================== */
+
+/* Handle/tirante visivo in cima alla bottom sheet */
+@media (max-width: 768px) {
+  .sidebar::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--border-light);
+    border-radius: 9999px;
+    margin: 0.625rem auto 0;
+  }
+
+  /* Backdrop cliccabile dietro la sidebar bottom sheet */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 35;
+  }
+
+  /* Dark mode: ombra più marcata */
+  [data-theme="dark"] .sidebar {
+    box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Riduce padding filter panel nella bottom sheet */
+  .filter-panel {
+    padding: 0.75rem 1rem 1.25rem;
+  }
+
+  /* Bottoni tipo parcheggio più compatti */
+  .type-button {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.8rem;
+  }
+  .type-icon { font-size: 1.1rem; }
+  .type-label { font-size: 0.75rem; }
+
+  /* Spot buttons più piccoli */
+  .spot-button {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  /* Reset button meno invadente */
+  .reset-button {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Dark mode admin cards */
+[data-theme="dark"] .admin-card-item {
+  background: var(--bg-card);
+  border-color: #334155;
+}
+[data-theme="dark"] .admin-card-body {
+  background: var(--bg-main);
+}
+[data-theme="dark"] .admin-card-header:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+/* ==================== BOTTOM NAV — SCHERMI PICCOLI ==================== */
+@media (max-width: 400px) {
+  .bottom-nav-item {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.6rem;
+  }
+
+  .bottom-nav-bar {
+    padding: 0.4rem 0.5rem;
+    gap: 0.1rem;
+  }
+}
+
+/* ==================== NAVIGATOR MOBILE — sidebar bottom sheet ==================== */
+@media (max-width: 768px) {
+  /* La sidebar del Navigator usa le stesse regole di .sidebar (bottom sheet) */
+  /* Override specifici per la lista parcheggi nel navigator */
+  .nav-sidebar-section {
+    padding: 0.75rem 1rem 0.5rem;
+  }
+
+  .nav-parking-list {
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+
+  /* nav-bottom-panel: già in top-right, nessun override necessario */
+}
+
+/* ==================== PROFILO — LOGOUT + ICONE ==================== */
+.btn-logout-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1.5px solid #ef4444;
+  border-radius: var(--radius-md);
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-logout-profile:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-edit-profile,
+.btn-cancel-edit,
+.btn-save-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.detail-icon-svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+/* ==================== NAVIGATOR — SEARCH WRAPPER ==================== */
+.nav-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-search-icon {
+  position: absolute;
+  left: 0.875rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.nav-search-input {
+  padding-left: 2.5rem !important;
+}
+
+.nav-parking-pin {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  margin-right: 0.25rem;
+}
+
+.nav-parking-vai {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.625rem;
+}
+
+/* ==================== NAVIGATOR — PANEL MOBILE COMPACT ==================== */
+@media (max-width: 768px) {
+  /* Il pannello è top-right come desktop, solo più compatto */
+  .nav-bottom-panel {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+    max-width: calc(100vw - 9rem); /* evita sovrapposizione col pulsante Cerca a sinistra */
+  }
+
+  .nav-bottom-label { font-size: 0.6rem; }
+
+  .nav-bottom-value {
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .nav-icon-button {
+    padding: 0.35rem;
+    border-radius: 9999px;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+}
+
+/* ==================== ADMIN — ICONE SVG NEI TABS E TITOLI ==================== */
+.admin-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.admin-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stat-icon svg {
+  display: block;
+}
+
+/* ==================== DATA LABEL CON ICONE ==================== */
+.data-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }

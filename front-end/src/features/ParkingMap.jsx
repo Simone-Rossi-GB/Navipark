@@ -135,15 +135,22 @@ export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'stree
                 /{selectedParking.capacita_totale ?? selectedParking.totalSpots} posti liberi
               </p>
               <p className="popup-address">{selectedParking.indirizzo ?? selectedParking.address}</p>
-              <button
-                className="popup-button"
-                onClick={() => onParkingClick && onParkingClick(selectedParking)}
-              >
-                Prenota ora
-              </button>
-                { user &&
-                    <button onClick={() => navigate('/navigator', {state: { parking: selectedParking } })} className="popup-button">Vai qui</button>
+              <div className="popup-buttons">
+                <button
+                  className="popup-button"
+                  onClick={() => onParkingClick && onParkingClick(selectedParking)}
+                >
+                  Prenota ora
+                </button>
+                {user &&
+                  <button
+                    className="popup-button"
+                    onClick={() => navigate('/navigator', { state: { parking: selectedParking } })}
+                  >
+                    Vai qui
+                  </button>
                 }
+              </div>
             </div>
           </Popup>
         )}

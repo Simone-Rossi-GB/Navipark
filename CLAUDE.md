@@ -188,4 +188,53 @@ useEffect(() => {
 - Token: `import.meta.env.VITE_MAPBOX_TOKEN`
 
 ## Prossimi task dopo il navigatore
-- **UI mobile**: nessun lavoro responsive fatto. La mappa occupa tutto su mobile, la sidebar è nascosta. Da pianificare dopo che il navigatore è completo.
+- **UI mobile/responsive**: nessun lavoro responsive fatto. Approccio scelto: Flexbox wrapping + CSS Grid auto-fill come strumenti principali, media query solo per i layout globali di pagina dove strettamente necessario. Da fare per ogni pagina: Home, Navigator, AdminDashboard, Profile, Bookings.
+
+---
+
+## Piano futuro — Capacitor (app store iOS/Android)
+
+Quando il progetto web è completo, si può pubblicare su App Store e Google Play usando **Capacitor** senza riscrivere nulla.
+
+### Come funziona
+Capacitor avvolge la build `dist/` di Vite in una WebView nativa. Il codice React rimane uno solo — modifiche a `src/` si propagano automaticamente a web, iOS e Android.
+
+### Struttura cartelle aggiunta da Capacitor
+```
+front-end/
+  ios/                   ← progetto Xcode (aggiunto da Capacitor)
+  android/               ← progetto Android Studio (aggiunto da Capacitor)
+  capacitor.config.ts    ← config Capacitor
+```
+
+### Flusso di lavoro
+1. `npm run build` → Vite compila `src/` in `dist/`
+2. `npx cap sync` → Capacitor copia `dist/` in `ios/` e `android/`
+3. Xcode → compila → App Store
+4. Android Studio → compila → Google Play
+
+### Due sole modifiche necessarie a `useNavigation.js`
+Le API web native non funzionano dentro WKWebView (iOS). Entrambe si risolvono con un `if (Capacitor.isNativePlatform())` nello stesso file:
+
+| API web attuale | Problema su iOS | Plugin Capacitor |
+|---|---|---|
+| `navigator.geolocation.watchPosition` | Bloccato da iOS su `capacitor://localhost` | `@capacitor/geolocation` (stessa firma) |
+| `window.speechSynthesis` | Bug WKWebView su iOS | `@capacitor-community/text-to-speech` |
+
+```js
+import { Capacitor } from '@capacitor/core'
+
+if (Capacitor.isNativePlatform()) {
+  // usa plugin Capacitor
+} else {
+  // comportamento web attuale invariato
+}
+```
+
+### Sequenza consigliata
+1. Finire navigatore + responsive web
+2. Aggiungere `manifest.json` (PWA gratuita — installabile da browser, specie Android)
+3. Integrare Capacitor quando si vuole pubblicare sugli store
+
+### Perché non Expo
+Expo è React Native: `react-map-gl` e Mapbox GL JS non esistono in React Native, andrebbero riscritti con `@rnmapbox/maps`. Scartato.

@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../context/ToastContext'
 import * as api from '../services/api'
+import {
+  User, Mail, Phone, Pencil, Save, X,
+  Ticket, Car, CalendarDays, Flag,
+  Trash2, LogOut, ParkingSquare, ShieldCheck
+} from 'lucide-react'
 
 export default function Profile() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const { addToast } = useToast()
+  const navigate = useNavigate()
 
   const [bookings, setBookings] = useState([])
   const [loadingBookings, setLoadingBookings] = useState(true)
@@ -40,6 +47,11 @@ export default function Profile() {
     } else {
       addToast('Errore nel salvataggio del profilo', 'error')
     }
+  }
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
   }
 
   const handleConfirmCancel = async () => {
@@ -106,6 +118,7 @@ export default function Profile() {
   }
 
   const activeCount = bookings.filter(b => b.stato === 'attiva').length
+  const isAdmin = user.ruolo === 'Admin' || user.role === 'Admin'
 
   return (
     <div className="profile-page">
@@ -118,24 +131,36 @@ export default function Profile() {
           <div className="profile-info">
             <h1 className="profile-name">{user.nome || user.name}</h1>
             <p className="profile-role">
-              {user.ruolo === 'Admin' || user.role === 'Admin' ? '👑 Amministratore' : '👤 Utente'}
+              {isAdmin
+                ? <><ShieldCheck size={14} style={{ display: 'inline', marginRight: '0.3rem' }} />Amministratore</>
+                : <><User size={14} style={{ display: 'inline', marginRight: '0.3rem' }} />Utente</>
+              }
             </p>
           </div>
+          <button className="btn-logout-profile" onClick={handleLogout} title="Esci">
+            <LogOut size={18} />
+            <span>Esci</span>
+          </button>
         </div>
 
         {/* Informazioni Personali */}
         <div className="profile-section">
           <div className="section-header">
-            <h2 className="section-title">📝 Informazioni Personali</h2>
+            <h2 className="section-title">
+              <User size={18} style={{ display: 'inline', marginRight: '0.5rem', verticalAlign: 'middle' }} />
+              Informazioni Personali
+            </h2>
             {!editingProfile ? (
               <button className="btn-edit-profile" onClick={() => setEditingProfile(true)}>
-                ✏️ Modifica
+                <Pencil size={15} /> Modifica
               </button>
             ) : (
               <div className="edit-actions">
-                <button className="btn-cancel-edit" onClick={() => setEditingProfile(false)}>Annulla</button>
+                <button className="btn-cancel-edit" onClick={() => setEditingProfile(false)}>
+                  <X size={15} /> Annulla
+                </button>
                 <button className="btn-save-profile" onClick={handleSaveProfile} disabled={savingProfile}>
-                  {savingProfile ? 'Salvataggio...' : '💾 Salva'}
+                  <Save size={15} /> {savingProfile ? 'Salvataggio...' : 'Salva'}
                 </button>
               </div>
             )}
@@ -164,15 +189,15 @@ export default function Profile() {
             ) : (
               <div className="data-grid">
                 <div className="data-item">
-                  <span className="data-label">Nome:</span>
+                  <span className="data-label"><User size={14} /> Nome</span>
                   <span className="data-value">{user.nome || user.name}</span>
                 </div>
                 <div className="data-item">
-                  <span className="data-label">Email:</span>
+                  <span className="data-label"><Mail size={14} /> Email</span>
                   <span className="data-value">{user.email}</span>
                 </div>
                 <div className="data-item">
-                  <span className="data-label">Telefono:</span>
+                  <span className="data-label"><Phone size={14} /> Telefono</span>
                   <span className="data-value">{profileData.telefono || 'Non impostato'}</span>
                 </div>
               </div>
@@ -183,7 +208,10 @@ export default function Profile() {
         {/* Prenotazioni */}
         <div className="profile-section">
           <div className="section-header">
-            <h2 className="section-title">🎫 Le Mie Prenotazioni</h2>
+            <h2 className="section-title">
+              <Ticket size={18} style={{ display: 'inline', marginRight: '0.5rem', verticalAlign: 'middle' }} />
+              Le Mie Prenotazioni
+            </h2>
             <span className="bookings-count">
               {activeCount > 0 && <span style={{ color: '#16a34a', marginRight: '0.5rem' }}>{activeCount} attive</span>}
               {bookings.length} totali
@@ -194,7 +222,7 @@ export default function Profile() {
             <div className="empty-state"><p>Caricamento...</p></div>
           ) : bookings.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">📭</div>
+              <Ticket size={40} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
               <h3>Nessuna prenotazione</h3>
               <p>Non hai ancora effettuato prenotazioni</p>
             </div>
@@ -206,7 +234,7 @@ export default function Profile() {
                   <div key={booking.id} className={`booking-card ${booking.stato}`}>
                     <div className="booking-header">
                       <div className="booking-parking">
-                        <span className="parking-icon">🅿️</span>
+                        <ParkingSquare size={16} />
                         <span className="parking-name">{booking.parcheggio_nome}</span>
                       </div>
                       <span className={`status-badge ${badge.cls}`}>{badge.label}</span>
@@ -214,30 +242,30 @@ export default function Profile() {
 
                     <div className="booking-details">
                       <div className="detail-row">
-                        <span className="detail-icon">🎫</span>
+                        <Ticket size={14} className="detail-icon-svg" />
                         <div className="detail-content">
-                          <span className="detail-label">Codice:</span>
+                          <span className="detail-label">Codice</span>
                           <span className="detail-value code">{booking.codice_prenotazione}</span>
                         </div>
                       </div>
                       <div className="detail-row">
-                        <span className="detail-icon">🚗</span>
+                        <Car size={14} className="detail-icon-svg" />
                         <div className="detail-content">
-                          <span className="detail-label">Targa:</span>
+                          <span className="detail-label">Targa</span>
                           <span className="detail-value">{booking.targa}</span>
                         </div>
                       </div>
                       <div className="detail-row">
-                        <span className="detail-icon">📅</span>
+                        <CalendarDays size={14} className="detail-icon-svg" />
                         <div className="detail-content">
-                          <span className="detail-label">Inizio:</span>
+                          <span className="detail-label">Inizio</span>
                           <span className="detail-value">{formatDate(booking.data_ora_inizio)}</span>
                         </div>
                       </div>
                       <div className="detail-row">
-                        <span className="detail-icon">🏁</span>
+                        <Flag size={14} className="detail-icon-svg" />
                         <div className="detail-content">
-                          <span className="detail-label">Fine:</span>
+                          <span className="detail-label">Fine</span>
                           <span className="detail-value">{formatDate(booking.data_ora_fine)}</span>
                         </div>
                       </div>
@@ -246,10 +274,10 @@ export default function Profile() {
                     {booking.stato === 'attiva' && (
                       <div className="booking-actions">
                         <button className="btn-modify" onClick={() => openModifyModal(booking)}>
-                          ✏️ Modifica
+                          <Pencil size={14} /> Modifica
                         </button>
                         <button className="btn-cancel" onClick={() => { setBookingToCancel(booking); setShowCancelModal(true) }}>
-                          🗑️ Annulla
+                          <Trash2 size={14} /> Annulla
                         </button>
                       </div>
                     )}
@@ -313,7 +341,7 @@ export default function Profile() {
             </div>
             <div className="modal-actions">
               <button className="btn-modal-cancel" onClick={() => setShowModifyModal(false)}>Annulla</button>
-              <button className="btn-save" onClick={handleConfirmModify}>💾 Salva Modifiche</button>
+              <button className="btn-save" onClick={handleConfirmModify}><Save size={14} /> Salva</button>
             </div>
           </div>
         </div>
