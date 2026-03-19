@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../context/ThemeContext'
+import { Map, Search, Compass, LayoutDashboard } from 'lucide-react'
 import * as api from '../services/api'
 
 export default function Header() {
@@ -49,22 +50,22 @@ export default function Header() {
 
         <nav className="header-nav">
           <NavLink to="/" end className="nav-link">
-            <span className="nav-icon">🗺️</span>
+            <Map size={18} strokeWidth={1.75} />
             <span>Mappa</span>
           </NavLink>
           <NavLink to="/search" className="nav-link">
-            <span className="nav-icon">🔍️</span>
+            <Search size={18} strokeWidth={1.75} />
             <span>Cerca prenotazione</span>
           </NavLink>
-            {user && (
-                <NavLink to="/navigator" className="nav-link">
-                    <span className="nav-icon">🧭</span>
-                    <span>Navigatore</span>
-                </NavLink>
-            )}
+          {user && (
+            <NavLink to="/navigator" className="nav-link">
+              <Compass size={18} strokeWidth={1.75} />
+              <span>Navigatore</span>
+            </NavLink>
+          )}
           {user && isAdmin() && (
             <NavLink to="/admin" className="nav-link">
-              <span className="nav-icon">📊</span>
+              <LayoutDashboard size={18} strokeWidth={1.75} />
               <span>Dashboard</span>
             </NavLink>
           )}

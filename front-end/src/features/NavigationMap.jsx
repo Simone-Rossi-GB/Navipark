@@ -64,6 +64,7 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
         bearing: 0
     })
 
+
     useEffect(() => {
         if(userPos && isViewLocked) {
             const bearing = prevUserPosRef.current ? calculateBearing(prevUserPosRef.current, userPos) : 0
@@ -74,6 +75,7 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
                 longitude: userPos.lng,
                 latitude: userPos.lat,
                 bearing: bearing,
+                dragPan: false,
                 pitch: 60}))
         }
     }, [userPos, isViewLocked]);

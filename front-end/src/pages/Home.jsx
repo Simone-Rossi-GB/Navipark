@@ -7,6 +7,7 @@ import { useTheme } from '../context/ThemeContext'
 import ParkingMap from '../features/ParkingMap'
 import FilterPanel from '../components/FilterPanel'
 import * as api from '../services/api'
+import { SlidersHorizontal, X } from 'lucide-react'
 
 // Validazione targa italiana: 2 lettere, 3 cifre, 2 lettere (es. AB123CD)
 const TARGA_REGEX = /^[A-Z]{2}[0-9]{3}[A-Z]{2}$/
@@ -28,6 +29,7 @@ export default function Home() {
     localStorage.getItem('theme') === 'dark' ? 'dark-v11' : 'streets-v12'
   )
   const [searchQuery, setSearchQuery] = useState('')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectedParking, setSelectedParking] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [bookingData, setBookingData] = useState({ targa: '', startDate: '', startHour: '', duration: 2 })
@@ -141,8 +143,8 @@ export default function Home() {
   }
 
   return (
-    <div className="home-container">
-      <aside className="sidebar">
+    <div className={`home-container${sidebarOpen ? ' sidebar-open' : ''}`}>
+      <aside className={`sidebar${sidebarOpen ? '' : ' sidebar-hidden'}`}>
         <FilterPanel onFilterChange={setFilters} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
         <div className="map-style-selector">
           <h3 className="filter-section-title">Stile Mappa</h3>
@@ -157,7 +159,18 @@ export default function Home() {
         </div>
       </aside>
 
+      {sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+
       <main className="map-main">
+        <button
+          className="nav-sidebar-toggle"
+          onClick={() => setSidebarOpen(prev => !prev)}
+        >
+          {sidebarOpen ? <X size={16} /> : <SlidersHorizontal size={16} />}
+          {sidebarOpen ? 'Chiudi' : 'Filtri'}
+        </button>
         <ParkingMap
           parkings={filteredParkings}
           onParkingClick={handleParkingClick}
