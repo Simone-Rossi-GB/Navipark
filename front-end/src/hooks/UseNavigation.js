@@ -1,6 +1,7 @@
 import {useState, useRef} from 'react'
 
-function speakInstruction(text) {
+function speakInstruction(text, muted = false) {
+    if (muted) return
     console.log("funzione speak chiamata:", text)
     if (!window.speechSynthesis) return
 
@@ -26,11 +27,12 @@ export function useNavigation() {
     const [isNavigating, setIsNavigating] = useState(false)
     const watchIDref = useRef(null) // id ref all'istanza di geolocalizzazione dell'utente via browser
     const lastSpokenDistance = useRef(1000) // soglia iniziale: parla quando mancano 1000m
+    const isMutedRef = useRef(false) // ref per isMuted: letta dentro watchPosition senza stale closure
 
 
     const startNavigation = async (destination) => {
         setIsNavigating(true)
-        speakInstruction("navigazione attivata. Percorso verso " + (destination.nome ?? destination.name ?? ''))
+        speakInstruction("navigazione attivata. Percorso verso " + (destination.nome ?? destination.name ?? ''), isMutedRef.current)
 
         watchIDref.current = navigator.geolocation.watchPosition(
             async (pos) => {
@@ -61,7 +63,7 @@ export function useNavigation() {
                 // Logica voce: parla quando la distanza rimasta scende sotto la soglia corrente
                 if (newRoute && newRoute.distance <= lastSpokenDistance.current && lastSpokenDistance.current > 0) {
                     const announcement = newRoute.legs[0]?.steps[0]?.voiceInstructions?.[0]?.announcement
-                    if (announcement) speakInstruction(announcement)
+                    if (announcement) speakInstruction(announcement, isMutedRef.current)
 
                     // avanza alla soglia successiva
                     if (lastSpokenDistance.current >= 1000)     lastSpokenDistance.current = 300
@@ -87,7 +89,9 @@ export function useNavigation() {
         lastSpokenDistance.current = 1000 // reset soglia per la prossima navigazione
     }
 
-    return { userPosition, route, distance, ETA, isNavigating, startNavigation, stopNavigation}
+    const setMuted = (val) => { isMutedRef.current = val }
+
+    return { userPosition, route, distance, ETA, isNavigating, startNavigation, stopNavigation, setMuted }
 }
 
 async function fetchRoute(from, to) {

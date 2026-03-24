@@ -22,7 +22,7 @@ export default function Navigator() {
             p.nome?.toLowerCase().includes(query) || p.indirizzo?.toLowerCase().includes(query)
         )
     })
-    const { userPosition, route, distance, ETA, isNavigating, startNavigation, stopNavigation } = useNavigation()
+    const { userPosition, route, distance, ETA, isNavigating, startNavigation, stopNavigation, setMuted } = useNavigation()
 
     useEffect(() => {
         if (destination) {
@@ -140,7 +140,7 @@ export default function Navigator() {
                         <div className="nav-bottom-actions">
                             <button
                                 className={`nav-icon-button ${isMuted ? '' : 'active'}`}
-                                onClick={() => setIsMuted(prev => !prev)}
+                                onClick={() => { const next = !isMuted; setIsMuted(next); setMuted(next) }}
                                 title={isMuted ? 'Attiva voce' : 'Silenzia voce'}
                             >
                                 {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
