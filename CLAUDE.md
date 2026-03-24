@@ -107,8 +107,24 @@ Il flusso è: click "Vai qui" su popup mappa → `navigate('/navigator', { state
 5. **Stop button redirect**: dopo `stopNavigation()` aggiungere `navigate(-1)` o `navigate('/')`
 6. **Mostrare destinazione attiva in cima alla sidebar** se navigazione in corso
 
+### Stato guida vocale — implementata ma con bug attivo
+La guida vocale è implementata in `src/hooks/UseNavigation.js` (nota: il file si chiama `UseNavigation.js` con U maiuscola).
+
+**Cosa funziona:**
+- `fetchRoute` chiede a Mapbox `voice_instructions=true&steps=true&language=it` → la risposta include `legs[0].steps[].voiceInstructions[]`
+- Logica soglie: quando `newRoute.distance` (metri rimasti) scende sotto 1000→300→150→50, parla l'annuncio del primo step corrente
+- `speakInstruction(text)` usa Web Speech API (`SpeechSynthesisUtterance`, `lang='it-IT'`)
+- All'avvio chiama `speakInstruction("navigazione attivata. Percorso verso " + destination.nome ?? ...)`
+
+**Bug attivo: `speakInstruction` viene chiamata (log visibile in console) ma non si sente niente.**
+Cause sospette:
+1. **Chrome bug noto**: `speechSynthesis` entra in stato sospeso (`.paused = true`) dopo inattività. Fix tentato: `resume()` prima di `speak()` + `setTimeout(100ms)` tra `cancel()` e `speak()`. Non ancora confermato funzionante.
+2. **User gesture context**: `speakInstruction` è chiamata da `useEffect` in Navigator.jsx (non direttamente dal click) — alcuni browser bloccano speech synthesis fuori dal contesto gesture.
+3. **`isMuted` non collegato**: il pulsante muto in Navigator.jsx aggiorna `isMuted` state ma non passa il valore a `useNavigation`/`speakInstruction`. Da collegare.
+
+**Prossimo step da investigare:** testare `window.speechSynthesis.speak(new SpeechSynthesisUtterance('test'))` direttamente in console per capire se è un problema del browser o del codice. Se funziona in console ma non nel codice → problema di user gesture context → spostare la prima `speakInstruction` direttamente nel click handler di `selectDestination` in `Navigator.jsx`.
+
 ### TODO futuri (non ancora iniziati)
-- **Guida vocale e banner**: aggiungere `voice_instructions=true&banner_instructions=true&roundabout_exits=true` all'URL, gestire `voiceInstructions[].distanceAlongGeometry` per il timing vocale, `bannerInstructions` per il banner sopra la mappa — vedi `guida_navigatore.md` per dettagli completi
 - **`driving-traffic`** al posto di `driving` per traffico reale
 - **Notifiche ZTL** con `ToastContext` leggendo `routes[0].legs[0].notifications`
 - **Rerouting automatico** se utente esce dal percorso
