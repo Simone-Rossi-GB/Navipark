@@ -10,7 +10,7 @@ class AuthController
 
     }
 
-    public static function controlToken(string $utente_id, string $token)
+    public static function controlToken(string $token)
     {
         $result = up::checkToken($utente_id, $token);
         return $result;

@@ -1,6 +1,7 @@
 <?php
 
 namespace Middleware;
+use Controller\AuthController;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Controller\AuthController as ac;
@@ -36,6 +37,17 @@ class AuthMiddleware
 
     public static function login($request, $handler)
     {
+        $utente = AuthController::login()
+        $ttl = 86400; // 24 ore in sec
+        $payload = [
+            'iss' => 'parcheggi-Brescia', // l'ente che rilascia il token
+            'sub' => $utente['id'], // a chi è associato
+            'iat' => time(), // orario generazione
+            'exp' => time() + $ttl // scadenza token
+        ];
+
+        $token = JWT::encode
+
         Response $response =
         return $response;
     }

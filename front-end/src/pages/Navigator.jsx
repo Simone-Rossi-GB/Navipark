@@ -19,7 +19,7 @@ export default function Navigator() {
     const filteredParkings = parkings.filter(p => {
         const query = searchParking.toLowerCase()
         return (
-            p.nome?.toLowerCase().includes(query) || p.indirizzo.toLowerCase().includes(query)
+            p.nome?.toLowerCase().includes(query) || p.indirizzo?.toLowerCase().includes(query)
         )
     })
     const { userPosition, route, distance, ETA, isNavigating, startNavigation, stopNavigation } = useNavigation()
