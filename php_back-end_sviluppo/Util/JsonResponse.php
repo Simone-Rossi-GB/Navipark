@@ -5,11 +5,9 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class JsonResponse
 {
-    public static function success(Response $response, array $status, ?array $data = null) {
+    public static function success(Response $response, ?array $data = null) {
         $body = [
             'success' => true,
-            'code' => $status[1],
-            'message' => $status[2]
         ];
 
 
@@ -19,15 +17,15 @@ class JsonResponse
 
         $response->getBody()->write(json_encode($body));
 
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($status[0]);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     public static function error(Response $response, array $status, ?array $details = null) {
 
         $body = [
-            'success' => true,
-            'code' => $status[1],
-            'message' => $status[2]
+            'success' => false,
+            'code' => $status['errorCode'],
+            'message' => $status['message']
         ];
 
         if ($details !== null) {
@@ -36,6 +34,6 @@ class JsonResponse
 
         $response->getBody()->write(json_encode($body));
 
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($status[0]);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status['httpStatus']);
     }
 }
