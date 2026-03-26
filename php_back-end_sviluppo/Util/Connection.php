@@ -19,7 +19,7 @@ class Connection
         // vuoto per non permettere la creazione di oggetti
     }
 
-    public static function getIstance(): PDO
+    public static function getInstance(): PDO
     {
         if (!isset(self::$istance)) {
             try {
