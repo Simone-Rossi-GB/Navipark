@@ -1,6 +1,79 @@
 import {useState, useRef} from 'react'
 
-function speakInstruction(text) {
+const AZURE_KEY = import.meta.env.VITE_AZURE_SPEECH_KEY
+const AZURE_REGION = import.meta.env.VITE_AZURE_SPEECH_REGION
+
+async function speakInstruction(text) {
+    console.log("funzione speak chiamata:", text)
+
+    // Azure Speech TTS (voce neurale italiana)
+    if (AZURE_KEY && AZURE_REGION) {
+        try {
+            const res = await fetch(
+                `https://${AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': AZURE_KEY,
+                        'Content-Type': 'application/ssml+xml',
+                        'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3'
+                    },
+                    body: `<speak version='1.0' xml:lang='it-IT'>
+                        <voice xml:lang='it-IT' name='it-IT-ElsaNeural'>
+                            ${text}
+                        </voice>
+                    </speak>`
+                }
+            )
+            if (res.ok) {
+                const blob = await res.blob()
+                const url = URL.createObjectURL(blob)
+                const audio = new Audio(url)
+                audio.onended = () => URL.revokeObjectURL(url)
+                audio.play()
+                return
+            }
+        } catch (e) {
+            console.warn('Azure Speech fallito, uso Web Speech API:', e)
+        }
+    }
+
+    // Fallback: Web Speech API con voce di sistema migliore
+    if (!window.speechSynthesis) return
+    window.speechSynthesis.cancel()
+    if (window.speechSynthesis.paused) window.speechSynthesis.resume()
+
+    const speak = (voice) => {
+        const utterance = new SpeechSynthesisUtterance(text)
+        utterance.lang = 'it-IT'
+        utterance.rate = 1.0
+        if (voice) utterance.voice = voice
+        window.speechSynthesis.speak(utterance)
+    }
+
+    const voices = window.speechSynthesis.getVoices()
+    if (voices.length) {
+        const priority = ['Federica', 'Alice', 'Luca', 'Elsa']
+        const best = priority.map(n => voices.find(v => v.name.includes(n) && v.lang.startsWith('it')))
+                             .find(Boolean)
+                     ?? voices.find(v => v.lang.startsWith('it') && v.localService)
+                     ?? voices.find(v => v.lang.startsWith('it'))
+        setTimeout(() => speak(best), 100)
+    } else {
+        window.speechSynthesis.onvoiceschanged = () => {
+            const vs = window.speechSynthesis.getVoices()
+            const priority = ['Federica', 'Alice', 'Luca', 'Elsa']
+            const best = priority.map(n => vs.find(v => v.name.includes(n) && v.lang.startsWith('it')))
+                                 .find(Boolean)
+                         ?? vs.find(v => v.lang.startsWith('it') && v.localService)
+                         ?? vs.find(v => v.lang.startsWith('it'))
+            speak(best)
+        }
+    }
+}
+
+/** @deprecated Usa speakInstruction() che include Azure Neural + fallback automatico */
+function speakInstructionLegacy(text) {
     console.log("funzione speak chiamata:", text)
     if (!window.speechSynthesis) return
 
@@ -26,6 +99,7 @@ export function useNavigation() {
     const [isNavigating, setIsNavigating] = useState(false)
     const watchIDref = useRef(null) // id ref all'istanza di geolocalizzazione dell'utente via browser
     const lastSpokenDistance = useRef(1000) // soglia iniziale: parla quando mancano 1000m
+    const isSpeakingRef = useRef(false) // lock per evitare istruzioni doppie
 
 
     const startNavigation = async (destination) => {
@@ -59,9 +133,12 @@ export function useNavigation() {
                 }
 
                 // Logica voce: parla quando la distanza rimasta scende sotto la soglia corrente
-                if (newRoute && newRoute.distance <= lastSpokenDistance.current && lastSpokenDistance.current > 0) {
+                if (newRoute && newRoute.distance <= lastSpokenDistance.current && lastSpokenDistance.current > 0 && !isSpeakingRef.current) {
                     const announcement = newRoute.legs[0]?.steps[0]?.voiceInstructions?.[0]?.announcement
-                    if (announcement) speakInstruction(announcement)
+                    if (announcement) {
+                        isSpeakingRef.current = true
+                        speakInstruction(announcement).finally(() => { isSpeakingRef.current = false })
+                    }
 
                     // avanza alla soglia successiva
                     if (lastSpokenDistance.current >= 1000)     lastSpokenDistance.current = 300

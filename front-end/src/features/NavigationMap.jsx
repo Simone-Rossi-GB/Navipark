@@ -75,7 +75,6 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
                 longitude: userPos.lng,
                 latitude: userPos.lat,
                 bearing: bearing,
-                dragPan: false,
                 pitch: 60}))
         }
     }, [userPos, isViewLocked]);
@@ -103,7 +102,9 @@ export default function NavigationMap({ destination, userPos, route, mapStyle = 
         <div className="parking-map-container" style={{ height: '100%', width: '100%' }}>
             <Map
                 {...viewState}
-                onMove={(evt) => setViewState(evt.viewState)}
+                onMove={(evt) => {
+                    if (!isViewLocked) setViewState(evt.viewState)
+                }}
                 onError={handleMapError}
                 style={{ width: '100%', height: '100%' }}
                 mapStyle={`mapbox://styles/mapbox/${mapStyle}`}
