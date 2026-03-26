@@ -192,5 +192,4 @@ class StatusCode
         'Code' => 'S002',
         'message' => 'Troppe richieste, riprova tra poco'
     ];
-
 }
