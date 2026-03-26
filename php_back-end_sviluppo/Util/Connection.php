@@ -1,39 +1,27 @@
 <?php
-
 namespace Util;
 
 use PDO;
 use PDOException;
+use RuntimeException;
 
 class Connection
 {
-    private static ?PDO $istance = null;
-    private static array $config = [
-        'dsn' => 'pgsql:host=lamp_pg_db;port=5432;dbname=postgres',
-        'username' => 'root',
-        'password' => 'password'
-    ];
+    private static ?PDO $instance = null;
 
-    private function __construct()
-    {
-        // vuoto per non permettere la creazione di oggetti
-    }
+    private function __construct() {}
 
-    public static function getInstance(): PDO
+    public static function getInstance(string $dsn = '', string $user = '', string $pass = ''): PDO
     {
-        if (!isset(self::$istance)) {
+        if (self::$instance === null) {
             try {
-                self::$istance = new PDO(
-                    self::$config['dsn'],
-                    self::$config['username'],
-                    self::$config['password']
-                );
-                self::$istance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$instance = new PDO($dsn, $user, $pass);
+                self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$instance->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             } catch (PDOException $e) {
-                // Handle connection error
-                throw new RuntimeException("[Connection.php] Database connection failed: " . $e->getMessage());
+                throw new RuntimeException('Database non raggiungibile: ' . $e->getMessage());
             }
         }
-        return self::$istance;
+        return self::$instance;
     }
 }
