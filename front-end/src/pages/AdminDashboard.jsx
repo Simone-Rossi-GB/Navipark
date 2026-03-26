@@ -4,7 +4,7 @@ import { useToast } from '../context/ToastContext'
 import * as api from '../services/api'
 import { Checkbox } from '@/components/base/checkbox/checkbox'
 import {
-  LayoutDashboard, ParkingSquare, CalendarDays, Plus, Pencil, Trash2,
+  LayoutDashboard, ParkingSquare, CalendarDays, Plus, Pencil, Trash2, Ban,
   Trophy, ChevronDown, ChevronUp, BarChart3, Leaf, BadgeCheck, Wallet
 } from 'lucide-react'
 
@@ -368,8 +368,8 @@ export default function AdminDashboard() {
                       <div className="admin-card-row"><span>Posti liberi</span><span className={p.posti_liberi < 10 ? 'text-red' : 'text-green'}>{p.posti_liberi}/{p.capacita_totale}</span></div>
                       <div className="admin-card-row"><span>Tariffa</span><span>€{p.tariffa_oraria.toFixed(2)}/h</span></div>
                       <div className="admin-card-actions">
-                        <button className="btn-edit" onClick={() => handleEditParking(p)}><Pencil size={14} /> Modifica</button>
-                        <button className="btn-delete" onClick={() => { setParkingToDelete(p); setShowDeleteModal(true) }}><Trash2 size={14} /> Elimina</button>
+                        <button className="btn-edit" title="Modifica" onClick={() => handleEditParking(p)}><Pencil size={14} /></button>
+                        <button className="btn-delete" title="Elimina" onClick={() => { setParkingToDelete(p); setShowDeleteModal(true) }}><Trash2 size={14} /></button>
                       </div>
                     </div>
                   )}
@@ -460,8 +460,8 @@ export default function AdminDashboard() {
                       <div className="admin-card-row"><span>Fine</span><span>{formatDT(b.data_ora_fine)}</span></div>
                       {b.stato === 'attiva' && (
                         <div className="admin-card-actions">
-                          <button className="btn-edit" onClick={() => handleEditBooking(b)}><Pencil size={14} /> Modifica</button>
-                          <button className="btn-delete" onClick={() => { setBookingToCancel(b); setShowCancelModal(true) }}>🚫 Annulla</button>
+                          <button className="btn-edit" title="Modifica" onClick={() => handleEditBooking(b)}><Pencil size={14} /></button>
+                          <button className="btn-delete" title="Annulla prenotazione" onClick={() => { setBookingToCancel(b); setShowCancelModal(true) }}><Ban size={14} /></button>
                         </div>
                       )}
                     </div>

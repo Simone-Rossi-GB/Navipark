@@ -15,7 +15,7 @@ const buildingLayer = {
   type: 'fill-extrusion',
   minzoom: 14,
   paint: {
-    'fill-extrusion-color': '#ddd',
+    'fill-extrusion-color': '#fff',
     'fill-extrusion-height': [
       'interpolate',
       ['linear'],

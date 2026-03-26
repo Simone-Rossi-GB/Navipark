@@ -44,8 +44,8 @@ export default function Header() {
     <header className="header">
       <div className="header-content">
         <Link to="/" className="header-logo">
-          <span className="logo-icon">🅿️</span>
-          <span className="logo-text">ParcheggioBrescia</span>
+          <img src="/icons/icon-192.png" alt="logo" className="logo-icon" />
+          <span className="logo-text">Navipark Brescia</span>
         </Link>
 
         <nav className="header-nav">
@@ -63,6 +63,7 @@ export default function Header() {
               <span>Navigatore</span>
             </NavLink>
           )}
+
           {user && isAdmin() && (
             <NavLink to="/admin" className="nav-link">
               <LayoutDashboard size={18} strokeWidth={1.75} />
