@@ -3,7 +3,8 @@ import {useState, useRef} from 'react'
 const AZURE_KEY = import.meta.env.VITE_AZURE_SPEECH_KEY
 const AZURE_REGION = import.meta.env.VITE_AZURE_SPEECH_REGION
 
-async function speakInstruction(text) {
+async function speakInstruction(text, muted = false) {
+    if (muted) return
     console.log("funzione speak chiamata:", text)
 
     // Azure Speech TTS (voce neurale italiana)
@@ -97,14 +98,15 @@ export function useNavigation() {
     const [distance, setDistance] = useState(null)
     const [ETA, setETA] = useState("-")
     const [isNavigating, setIsNavigating] = useState(false)
-    const watchIDref = useRef(null) // id ref all'istanza di geolocalizzazione dell'utente via browser
-    const lastSpokenDistance = useRef(1000) // soglia iniziale: parla quando mancano 1000m
-    const isSpeakingRef = useRef(false) // lock per evitare istruzioni doppie
+    const watchIDref = useRef(null)
+    const lastSpokenDistance = useRef(1000)
+    const isSpeakingRef = useRef(false)
+    const isMutedRef = useRef(false)
 
 
     const startNavigation = async (destination) => {
         setIsNavigating(true)
-        speakInstruction("navigazione attivata. Percorso verso " + (destination.nome ?? destination.name ?? ''))
+        speakInstruction("navigazione attivata. Percorso verso " + (destination.nome ?? destination.name ?? ''), isMutedRef.current)
 
         watchIDref.current = navigator.geolocation.watchPosition(
             async (pos) => {
@@ -137,7 +139,7 @@ export function useNavigation() {
                     const announcement = newRoute.legs[0]?.steps[0]?.voiceInstructions?.[0]?.announcement
                     if (announcement) {
                         isSpeakingRef.current = true
-                        speakInstruction(announcement).finally(() => { isSpeakingRef.current = false })
+                        speakInstruction(announcement, isMutedRef.current).finally(() => { isSpeakingRef.current = false })
                     }
 
                     // avanza alla soglia successiva
@@ -164,7 +166,9 @@ export function useNavigation() {
         lastSpokenDistance.current = 1000 // reset soglia per la prossima navigazione
     }
 
-    return { userPosition, route, distance, ETA, isNavigating, startNavigation, stopNavigation}
+    const setMuted = (val) => { isMutedRef.current = val }
+
+    return { userPosition, route, distance, ETA, isNavigating, startNavigation, stopNavigation, setMuted }
 }
 
 async function fetchRoute(from, to) {

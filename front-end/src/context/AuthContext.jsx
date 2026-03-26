@@ -14,13 +14,14 @@ export function AuthProvider({ children }) {
       nome: name,
       email: userData.email || '',
       telefono: userData.telefono || '',
-      role: userData.role || userData.ruolo || 'User',
       ruolo: userData.ruolo || userData.role || 'User',
     })
   }
+
   function logout() {
     setUser(null)
   }
+
   function isAdmin() {
     return user?.role === 'Admin' || user?.ruolo === 'Admin'
   }
