@@ -85,22 +85,112 @@ class StatusCode
 
     // STATUS CODE DEL DATABASE -> PARCHEGGIO
 
+    public const PARCHEGGIO_NON_TROVATO = [
+        'httpStatus' => 404,
+        'Code' => 'P001',
+        'message' => 'Parcheggio non trovato'
+    ];
 
+    public const PARCHEGGIO_CREATO = [
+        'httpStatus' => 201,
+        'Code' => 'P010',
+        'message' => 'Parcheggio creato con successo'
+    ];
+
+    public const PARCHEGGIO_AGGIORNATO = [
+        'httpStatus' => 200,
+        'Code' => 'P011',
+        'message' => 'Parcheggio aggiornato con successo'
+    ];
+
+    public const PARCHEGGIO_ELIMINATO = [
+        'httpStatus' => 200,
+        'Code' => 'P012',
+        'message' => 'Parcheggio eliminato con successo'
+    ];
 
     // STATUS CODE DEL DATABASE -> PRENOTAZIONE
 
+    public const PRENOTAZIONE_NON_TROVATA = [
+        'httpStatus' => 404,
+        'Code' => 'R001',
+        'message' => 'Prenotazione non trovata'
+    ];
 
+    public const PRENOTAZIONE_GIA_ANNULLATA = [
+        'httpStatus' => 409,
+        'Code' => 'R002',
+        'message' => 'La prenotazione è già stata annullata'
+    ];
+
+    public const PRENOTAZIONE_PARCHEGGIO_PIENO = [
+        'httpStatus' => 409,
+        'Code' => 'R003',
+        'message' => 'Parcheggio pieno in questo intervallo orario'
+    ];
+
+    public const PRENOTAZIONE_CREATA = [
+        'httpStatus' => 201,
+        'Code' => 'R010',
+        'message' => 'Prenotazione creata con successo'
+    ];
+
+    public const PRENOTAZIONE_AGGIORNATA = [
+        'httpStatus' => 200,
+        'Code' => 'R011',
+        'message' => 'Prenotazione aggiornata con successo'
+    ];
+
+    public const PRENOTAZIONE_ANNULLATA = [
+        'httpStatus' => 200,
+        'Code' => 'R012',
+        'message' => 'Prenotazione annullata con successo'
+    ];
 
     // STATUS CODE DI VALIDAZIONE
 
-    public const VALIDATION_REQUEST_FAILED = [
+    public const VALIDAZIONE_CAMPI_MANCANTI = [
         'httpStatus' => 400,
         'Code' => 'V001',
-        'message' => 'Fallita la validazione della richiesta'
+        'message' => 'Campi obbligatori mancanti'
+    ];
+
+    public const VALIDAZIONE_EMAIL_NON_VALIDA = [
+        'httpStatus' => 400,
+        'Code' => 'V002',
+        'message' => 'Formato email non valido'
+    ];
+
+    public const VALIDAZIONE_TARGA_NON_VALIDA = [
+        'httpStatus' => 400,
+        'Code' => 'V003',
+        'message' => 'Formato targa non valido (es: AB123CD)'
+    ];
+
+    public const VALIDAZIONE_DATE_NON_VALIDE = [
+        'httpStatus' => 400,
+        'Code' => 'V004',
+        'message' => 'Date non valide'
+    ];
+
+    public const VALIDAZIONE_PASSWORD_DEBOLE = [
+        'httpStatus' => 400,
+        'Code' => 'V005',
+        'message' => 'La password deve avere almeno 8 caratteri'
     ];
 
     // STATUS CODE DEL SERVER
 
+    public const SERVER_ERRORE_INTERNO = [
+        'httpStatus' => 500,
+        'Code' => 'S001',
+        'message' => 'Errore interno del server'
+    ];
 
+    public const SERVER_TROPPE_RICHIESTE = [
+        'httpStatus' => 429,
+        'Code' => 'S002',
+        'message' => 'Troppe richieste, riprova tra poco'
+    ];
 
 }
