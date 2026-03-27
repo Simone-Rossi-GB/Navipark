@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:www.untitledui.com)",
+      "Bash(npm install:*)",
+      "Bash(npx untitledui@latest add:*)",
+      "Bash(printf:*)",
+      "Bash(git rm:*)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}
