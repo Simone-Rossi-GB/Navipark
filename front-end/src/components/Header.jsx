@@ -6,7 +6,7 @@ import { Map, Search, Compass, LayoutDashboard } from 'lucide-react'
 import * as api from '../services/api'
 
 export default function Header() {
-  const { user, logout, isAdmin } = useAuth()
+  const { user, logout, isAdmin, token } = useAuth()
   const { darkMode, toggleDarkMode } = useTheme()
   const [showMenu, setShowMenu] = useState(false)
   const [activeBookings, setActiveBookings] = useState(0)
@@ -16,7 +16,7 @@ export default function Header() {
   // Carica conteggio prenotazioni attive
   useEffect(() => {
     if (!user) { setActiveBookings(0); return }
-    api.getPrenotazioniByUser(user.id).then(res => {
+    api.getPrenotazioniByUser(user.id, token).then(res => {
       if (res.success) {
         setActiveBookings(res.data.filter(b => b.stato === 'attiva').length)
       }

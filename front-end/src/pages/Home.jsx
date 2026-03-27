@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuidv4 } from 'uuid'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../context/ToastContext'
 import { useTheme } from '../context/ThemeContext'
@@ -110,8 +109,6 @@ export default function Home() {
 
     const startDate = new Date(`${bookingData.startDate}T${bookingData.startHour}`)
     const endDate = new Date(startDate.getTime() + bookingData.duration * 3600000)
-    const codice = uuidv4().slice(0, 8).toUpperCase()
-
     const res = await api.createPrenotazione({
       parcheggio_id: selectedParking.id,
       targa: bookingData.targa,
@@ -121,6 +118,7 @@ export default function Home() {
     setSubmitting(false)
 
     if (res.success) {
+      const codice = res.data.codice_prenotazione
       // Aggiorna posti liberi localmente
       setParkings(prev => prev.map(p =>
         p.id === selectedParking.id ? { ...p, posti_liberi: Math.max(0, p.posti_liberi - 1) } : p

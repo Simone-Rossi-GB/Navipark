@@ -14,7 +14,17 @@ async function request(method, path, body = null, token = null) {
     headers,
     body: body ? JSON.stringify(body) : null,
   })
-  return res.json()
+  const text = await res.text()
+  try {
+    const data = JSON.parse(text)
+    if (!data.success) {
+      console.error(`[API ${res.status}] ${method} ${path} →`, data.code, '|', data.message, data.data ?? '')
+    }
+    return data
+  } catch (e) {
+    console.error(`[API ${res.status}] ${method} ${path} → Risposta non-JSON:`, text.substring(0, 300))
+    return { success: false, code: 'S001', message: 'Errore interno del server', data: null }
+  }
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────

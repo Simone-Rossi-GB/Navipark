@@ -20,7 +20,7 @@ class Validator {
         return strlen($password) >= 8;
     }
 
-    public static function dataRange(string $inizio, string $fine): bool {
+    public static function dateRange(string $inizio, string $fine): bool {
         $a = strtotime($inizio);
         $b = strtotime($fine);
         return $a !== false && $b !== false && $b > $a;

@@ -1954,6 +1954,8 @@
   font-family: 'Courier New', monospace;
   color: var(--primary-blue);
   letter-spacing: 0.05em;
+  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .booking-actions {
