@@ -19,11 +19,10 @@ async function speakInstruction(text, muted = false) {
                         'Content-Type': 'application/ssml+xml',
                         'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3'
                     },
-                    body: `<speak version='1.0' xml:lang='it-IT'>
-                        <voice xml:lang='it-IT' name='it-IT-ElsaNeural'>
-                            ${text}
-                        </voice>
-                    </speak>`
+                    body: (() => {
+                        const voice = localStorage.getItem('nav_azure_voice') || 'it-IT-ElsaNeural'
+                        return `<speak version='1.0' xml:lang='it-IT'><voice xml:lang='it-IT' name='${voice}'>${text}</voice></speak>`
+                    })()
                 }
             )
             if (res.ok) {
@@ -52,23 +51,25 @@ async function speakInstruction(text, muted = false) {
         window.speechSynthesis.speak(utterance)
     }
 
+    function pickVoice(vs) {
+        const saved = localStorage.getItem('nav_voice')
+        if (saved) {
+            const found = vs.find(v => v.name === saved)
+            if (found) return found
+        }
+        const priority = ['Federica', 'Alice', 'Luca', 'Elsa']
+        return priority.map(n => vs.find(v => v.name.includes(n) && v.lang.startsWith('it')))
+                       .find(Boolean)
+               ?? vs.find(v => v.lang.startsWith('it') && v.localService)
+               ?? vs.find(v => v.lang.startsWith('it'))
+    }
+
     const voices = window.speechSynthesis.getVoices()
     if (voices.length) {
-        const priority = ['Federica', 'Alice', 'Luca', 'Elsa']
-        const best = priority.map(n => voices.find(v => v.name.includes(n) && v.lang.startsWith('it')))
-                             .find(Boolean)
-                     ?? voices.find(v => v.lang.startsWith('it') && v.localService)
-                     ?? voices.find(v => v.lang.startsWith('it'))
-        setTimeout(() => speak(best), 100)
+        setTimeout(() => speak(pickVoice(voices)), 100)
     } else {
         window.speechSynthesis.onvoiceschanged = () => {
-            const vs = window.speechSynthesis.getVoices()
-            const priority = ['Federica', 'Alice', 'Luca', 'Elsa']
-            const best = priority.map(n => vs.find(v => v.name.includes(n) && v.lang.startsWith('it')))
-                                 .find(Boolean)
-                         ?? vs.find(v => v.lang.startsWith('it') && v.localService)
-                         ?? vs.find(v => v.lang.startsWith('it'))
-            speak(best)
+            speak(pickVoice(window.speechSynthesis.getVoices()))
         }
     }
 }

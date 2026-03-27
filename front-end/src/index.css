@@ -124,8 +124,6 @@
 [data-theme="dark"] .stat-card,
 [data-theme="dark"] .top-parkings,
 [data-theme="dark"] .parkings-crud,
-[data-theme="dark"] .profile-section,
-[data-theme="dark"] .profile-header,
 [data-theme="dark"] .login-card {
   background: #1e293b;
 }
@@ -272,9 +270,14 @@
   min-width: 280px;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   background-color: var(--bg-main);
   color: var(--text-primary);
   transition: background-color 0.2s, color 0.2s;

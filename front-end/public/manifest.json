@@ -1,6 +1,6 @@
 {
-  "name": "ParcheggioBrescia",
-  "short_name": "Parcheggi",
+  "name": "Navipark Brescia",
+  "short_name": "Navipark",
   "description": "Prenota e naviga verso i parcheggi di Brescia",
   "start_url": "/",
   "display": "standalone",
