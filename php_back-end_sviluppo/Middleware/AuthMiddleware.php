@@ -1,62 +1,48 @@
 <?php
-
 namespace Middleware;
-use Controller\AuthController;
+
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Controller\AuthController as ac;
+use Psr\Http\Server\RequestHandlerInterface as Handler;
+use Model\SessioneRepository;
+use Util\StatusCode;
 use Util\JsonResponse;
+use Util\JwtHelper;
+use Slim\Psr7\Response as SlimResponse;
 
 class AuthMiddleware
 {
-    public static function authenticateToken($request, $handler) {
-        $token = $request->getHeaderLine('Authorization');
-        $body = $request->getBody();
-        $utente_id = $body['utente_id'];
-        $result = ac::controlToken($utente_id, $token);
-    }
+    public function __construct(
+        private SessioneRepository $sessioni,
+        private string             $jwtSecret
+    ) {}
 
-    public static function validateAuthRequest($request)
+    public function __invoke(Request $request, Handler $handler): Response
     {
-        $authHeader = $request->getHeaderLine('Authorizarion');
+        $authHeader = $request->getHeaderLine('Authorization');
 
         if (empty($authHeader)) {
-            return JsonResponse::error('token mancante', \StatusCode::AUTH_TOKEN_NOT_FOUND);
+            return JsonResponse::error(new SlimResponse(), StatusCode::AUTH_TOKEN_MANCANTE);
+        }
+        if (!preg_match('/^Bearer\s+(\S+)$/', $authHeader, $matches)) {
+            return JsonResponse::error(new SlimResponse(), StatusCode::AUTH_TOKEN_NON_VALIDO);
         }
 
-        $jwtRegex = '/^Bearer\s+([a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+)$/';
+        $token    = $matches[1];
+        $utenteId = JwtHelper::verify($token, $this->jwtSecret);
 
-        if (!preg_match($jwtRegex, $authHeader, $matches)) {
-            return JsonResponse::error('token non rispetta il regex', \StatusCode::VALIDATION_REQUEST_FAILED);
+        if ($utenteId === null) {
+            return JsonResponse::error(new SlimResponse(), StatusCode::AUTH_SESSIONE_SCADUTA);
         }
 
-        $token = $matches[1];
+        // Controlla che la sessione esista ancora nel DB (permette logout reale)
+        $sessione = $this->sessioni->findByToken($token);
+        if (!$sessione) {
+            return JsonResponse::error(new SlimResponse(), StatusCode::AUTH_TOKEN_NON_VALIDO);
+        }
 
-        return $token;
-    }
-
-    public static function login($request, $handler)
-    {
-        $utente = AuthController::login()
-        $ttl = 86400; // 24 ore in sec
-        $payload = [
-            'iss' => 'parcheggi-Brescia', // l'ente che rilascia il token
-            'sub' => $utente['id'], // a chi è associato
-            'iat' => time(), // orario generazione
-            'exp' => time() + $ttl // scadenza token
-        ];
-
-        $token = JWT::encode
-
-        Response $response =
-        return $response;
-    }
-
-    public static function register($request, $handler) {
-
-    }
-
-    public static function generateToken($request, $handler) {
-
+        // I controller leggono l'utente con: $request->getAttribute('utente')
+        // Contiene: utente_id, email, nome, cognome, ruolo
+        return $handler->handle($request->withAttribute('utente', $sessione));
     }
 }
