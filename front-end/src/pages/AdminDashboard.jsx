@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { useToast } from '../context/ToastContext'
+import { useAuth } from '../hooks/useAuth'
 import * as api from '../services/api'
 import { Checkbox } from '@/components/base/checkbox/checkbox'
 import {
@@ -42,6 +43,7 @@ function formatDT(iso) {
 
 export default function AdminDashboard() {
   const { addToast } = useToast()
+  const { token } = useAuth()
   const [activeTab, setActiveTab] = useState('parcheggi')
 
   // ── Parcheggi ──
@@ -69,8 +71,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     api.getParcheggi().then(res => { if (res.success) setParkings(res.data) })
-    api.getAdminStats().then(res => { if (res.success) setStats(res.data) })
-    api.getAllPrenotazioni().then(res => { if (res.success) setBookings(res.data) })
+    api.getAdminStats(token).then(res => { if (res.success) setStats(res.data) })
+    api.getAllPrenotazioni(token).then(res => { if (res.success) setBookings(res.data) })
   }, [])
 
   // ── Parcheggi handlers ──
@@ -96,7 +98,7 @@ export default function AdminDashboard() {
   }
 
   const handleDeleteParking = async () => {
-    const res = await api.deleteParcheggio(parkingToDelete.id)
+    const res = await api.deleteParcheggio(parkingToDelete.id, token)
     if (res.success) {
       setParkings(prev => prev.filter(p => p.id !== parkingToDelete.id))
       addToast(`Parcheggio "${parkingToDelete.nome}" eliminato`, 'success')
@@ -110,7 +112,7 @@ export default function AdminDashboard() {
   const handleParkingSubmit = async (e) => {
     e.preventDefault()
     if (editingParking) {
-      const res = await api.updateParcheggio(editingParking.id, parkingForm)
+      const res = await api.updateParcheggio(editingParking.id, parkingForm, token)
       if (res.success) {
         setParkings(prev => prev.map(p => p.id === editingParking.id ? res.data : p))
         addToast('Parcheggio aggiornato con successo', 'success')
@@ -118,7 +120,7 @@ export default function AdminDashboard() {
         addToast('Errore durante l\'aggiornamento', 'error')
       }
     } else {
-      const res = await api.createParcheggio(parkingForm)
+      const res = await api.createParcheggio(parkingForm, token)
       if (res.success) {
         setParkings(prev => [...prev, res.data])
         addToast('Parcheggio creato con successo', 'success')
@@ -217,7 +219,7 @@ export default function AdminDashboard() {
         targa: bookingForm.targa,
         data_ora_inizio: new Date(bookingForm.data_ora_inizio).toISOString(),
         data_ora_fine: new Date(bookingForm.data_ora_fine).toISOString(),
-      })
+      }, token)
       if (res.success) {
         setBookings(prev => prev.map(b => b.id === editingBooking.id ? res.data : b))
         addToast('Prenotazione aggiornata', 'success')
@@ -234,7 +236,7 @@ export default function AdminDashboard() {
         targa: bookingForm.targa,
         data_ora_inizio: new Date(bookingForm.data_ora_inizio).toISOString(),
         data_ora_fine: new Date(bookingForm.data_ora_fine).toISOString(),
-      })
+      }, token)
       if (res.success) {
         setBookings(prev => [...prev, res.data])
         if (parking) {
@@ -251,7 +253,7 @@ export default function AdminDashboard() {
   }
 
   const handleConfirmCancel = async () => {
-    const res = await api.cancelPrenotazione(bookingToCancel.id)
+    const res = await api.cancelPrenotazione(bookingToCancel.id, token)
     if (res.success) {
       setBookings(prev => prev.map(b => b.id === bookingToCancel.id ? { ...b, stato: 'annullata' } : b))
       const parking = parkings.find(p => p.id === bookingToCancel.parcheggio_id)

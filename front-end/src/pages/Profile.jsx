@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 
 export default function Profile() {
-  const { user, logout } = useAuth()
+  const { user, logout, token } = useAuth()
   const { addToast } = useToast()
   const navigate = useNavigate()
 
@@ -31,7 +31,7 @@ export default function Profile() {
 
   useEffect(() => {
     if (!user) return
-    api.getPrenotazioniByUser(user.id).then(res => {
+    api.getPrenotazioniByUser(user.id, token).then(res => {
       if (res.success) setBookings(res.data)
       setLoadingBookings(false)
     })
@@ -39,7 +39,7 @@ export default function Profile() {
 
   const handleSaveProfile = async () => {
     setSavingProfile(true)
-    const res = await api.updateProfilo(user.id, profileData)
+    const res = await api.updateProfilo(user.id, profileData, token)
     setSavingProfile(false)
     if (res.success) {
       addToast('Profilo aggiornato con successo', 'success')
@@ -55,7 +55,7 @@ export default function Profile() {
   }
 
   const handleConfirmCancel = async () => {
-    const res = await api.cancelPrenotazione(bookingToCancel.id)
+    const res = await api.cancelPrenotazione(bookingToCancel.id, token)
     if (res.success) {
       setBookings(prev => prev.map(b => b.id === bookingToCancel.id ? { ...b, stato: 'annullata' } : b))
       addToast('Prenotazione annullata', 'success')
@@ -81,7 +81,7 @@ export default function Profile() {
       targa: modifyData.targa.toUpperCase(),
       data_ora_inizio: new Date(modifyData.data_ora_inizio).toISOString(),
       data_ora_fine: new Date(modifyData.data_ora_fine).toISOString(),
-    })
+    }, token)
     if (res.success) {
       setBookings(prev => prev.map(b => b.id === bookingToModify.id ? res.data : b))
       addToast('Prenotazione modificata con successo', 'success')

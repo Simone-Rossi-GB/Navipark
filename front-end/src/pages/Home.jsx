@@ -13,7 +13,7 @@ import { SlidersHorizontal, X } from 'lucide-react'
 const TARGA_REGEX = /^[A-Z]{2}[0-9]{3}[A-Z]{2}$/
 
 export default function Home() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const { addToast } = useToast()
   const { darkMode } = useTheme()
   const navigate = useNavigate()
@@ -113,14 +113,11 @@ export default function Home() {
     const codice = uuidv4().slice(0, 8).toUpperCase()
 
     const res = await api.createPrenotazione({
-      codice_prenotazione: codice,
-      utente_id: user.id,
       parcheggio_id: selectedParking.id,
-      parcheggio_nome: selectedParking.nome,
       targa: bookingData.targa,
       data_ora_inizio: startDate.toISOString(),
       data_ora_fine: endDate.toISOString(),
-    })
+    }, token)
     setSubmitting(false)
 
     if (res.success) {

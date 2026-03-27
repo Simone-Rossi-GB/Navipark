@@ -96,7 +96,12 @@ class ParcheggioRepository
     // Qui la decodifichiamo in array PHP così il frontend riceve un array JS
     private function decode(array $row): array
     {
-        $row['servizi'] = json_decode($row['servizi'] ?? '[]', true) ?? [];
+        $row['servizi']          = json_decode($row['servizi'] ?? '[]', true) ?? [];
+        $row['tariffa_oraria']   = (float) $row['tariffa_oraria'];
+        $row['lat']              = (float) $row['lat'];
+        $row['lng']              = (float) $row['lng'];
+        $row['capacita_totale']  = (int)   $row['capacita_totale'];
+        $row['posti_liberi']     = (int)   $row['posti_liberi'];
         return $row;
     }
 }

@@ -4,11 +4,9 @@ services:
     build:
       context: ./apache-php
       dockerfile: Dockerfile
-      args:
-      # Configurazione proxy opzionale
-       #Decommentare e configurare se necessario:
-        PROXY_HOST: "10.4.53.9"  # o l'IP della macchina host
-        PROXY_PORT: "8888"                  # porta del proxy
+      # args:
+      #   PROXY_HOST: "10.4.53.9"
+      #   PROXY_PORT: "8888"
     container_name: lamp_web
     ports:
       - "10080:80"
