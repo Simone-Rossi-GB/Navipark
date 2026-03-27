@@ -3,7 +3,7 @@ import { useToast } from '../context/ToastContext'
 import * as api from '../services/api'
 
 // Codici disponibili nei dati mock (solo per sviluppo)
-const MOCK_CODES = ['A7B2C9D1', 'E3F6G8H4', 'K1L5M0N7', 'P2Q4R6S8', 'T5U0V3W9', 'X7Y1Z4A0', 'B8C2D5E3']
+const MOCK_CODES = ['pPEngZs58JiyyeFJt8GBH', 'tEy-k0lldBiBNjMGpwqL1', '2HHUPUp99t280IvNCGclg']
 
 export default function Search() {
   const { addToast } = useToast()
@@ -83,11 +83,11 @@ export default function Search() {
           <div className="search-input-group">
             <input
               type="text"
-              placeholder="Es: A7B2C9D1"
+              placeholder="Es: pPEngZs58JiyyeFJt8GBH"
               value={searchCode}
-              onChange={e => setSearchCode(e.target.value.toUpperCase())}
+              onChange={e => setSearchCode(e.target.value)}
               className="search-input"
-              maxLength="20"
+              maxLength="21"
               required
             />
             <button type="submit" className="search-button" disabled={searching || !searchCode.trim()}>

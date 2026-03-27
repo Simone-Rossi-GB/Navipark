@@ -385,7 +385,12 @@ export default function Profile() {
                         <Ticket size={14} className="detail-icon-svg" />
                         <div className="detail-content">
                           <span className="detail-label">Codice</span>
-                          <span className="detail-value code">{booking.codice_prenotazione}</span>
+                          <span
+                            className="detail-value code"
+                            title="Clicca per copiare"
+                            onClick={() => navigator.clipboard.writeText(booking.codice_prenotazione)}
+                            style={{ cursor: 'pointer', wordBreak: 'break-all' }}
+                          >{booking.codice_prenotazione}</span>
                         </div>
                       </div>
                       <div className="detail-row">

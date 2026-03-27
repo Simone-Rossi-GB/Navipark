@@ -91,6 +91,12 @@ class StatusCode
         'message' => 'Parcheggio non trovato'
     ];
 
+    public const PARCHEGGIO_PIENO = [
+        'httpStatus' => 404,
+        'Code' => 'P002',
+        'message' => 'Parcheggio pieno'
+    ];
+
     public const PARCHEGGIO_CREATO = [
         'httpStatus' => 201,
         'Code' => 'P010',
