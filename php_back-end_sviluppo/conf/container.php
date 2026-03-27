@@ -30,16 +30,16 @@ $builder->AddDefinitions([
     ),
 
     UtenteController::class => fn($c) => new UtenteController(
-        $c->get(UtenteController::class)
+        $c->get(UtenteRepository::class)
     ),
 
     ParcheggioController::class => fn($c) => new ParcheggioController(
-        $c->get(ParcheggioController::class)
+        $c->get(ParcheggioRepository::class)
     ),
 
     PrenotazioneController::class => fn($c) => new PrenotazioneController(
-        $c->get(PrenotazioneController::class),
-        $c->get(PrenotazioneRepository::class)
+        $c->get(PrenotazioneRepository::class),
+        $c->get(ParcheggioRepository::class)
     ),
 ]);
 

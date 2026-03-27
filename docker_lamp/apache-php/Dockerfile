@@ -24,6 +24,9 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \    
     && docker-php-ext-install zip pdo_pgsql
  
+# Installa Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 # Abilita mod_rewrite di Apache
 RUN a2enmod rewrite
 

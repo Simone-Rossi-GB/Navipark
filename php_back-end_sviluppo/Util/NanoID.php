@@ -1,9 +1,8 @@
 <?php
 
-use Hidehalo\Nanoid\Client;
-use Hidehalo\Nanoid\GeneratorInterface;
-
 namespace Util;
+
+use Hidehalo\Nanoid\Client;
 
 class NanoID {
 

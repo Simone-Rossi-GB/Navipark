@@ -2,8 +2,8 @@
 // Cambia USE_MOCK a false e imposta API_BASE_URL quando il backend PHP è pronto.
 import * as mock from './mockHandlers.js'
 
-const USE_MOCK = true
-const API_BASE_URL = 'http://localhost:10080/v1'
+const USE_MOCK = false
+const API_BASE_URL = 'https://simoxhomenet.ddns.net:1080/v1'
 
 // Helper per chiamate reali al backend PHP
 async function request(method, path, body = null, token = null) {
@@ -18,6 +18,11 @@ async function request(method, path, body = null, token = null) {
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
+
+export async function register(data) {
+  if (USE_MOCK) return mock.mockLogin(data.email, data.password)
+  return request('POST', '/auth/register', data)
+}
 
 export async function login(email, password) {
   if (USE_MOCK) return mock.mockLogin(email, password)

@@ -9,6 +9,7 @@ import BottomNav from './components/BottomNav'
 import Home from './pages/Home'
 import Navigator from './pages/Navigator'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Search from './pages/Search'
 import AdminDashboard from './pages/AdminDashboard'
 import Profile from './pages/Profile'
@@ -34,6 +35,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
+      <Route path="/register" element={!user ? <Register /> : <Navigate to="/" replace />} />
       {/* Home è PUBBLICA - chiunque può vedere la mappa */}
       <Route path="/" element={<Home />} />
       {/* Search è PUBBLICA - chiunque può cercare una prenotazione */}

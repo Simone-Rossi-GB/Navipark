@@ -1,4 +1,6 @@
 <?php
+namespace Util;
+
 class StatusCode
 {
 

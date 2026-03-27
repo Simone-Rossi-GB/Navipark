@@ -9,26 +9,26 @@ class JsonResponse
     {
         $body = [
             'success' => true,
-            'code'    => $status[1],
-            'message' => $status[2],
+            'code'    => $status['Code'],
+            'message' => $status['message'],
             'data'    => $data,
         ];
         $response->getBody()->write(json_encode($body));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($status[0]);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status['httpStatus']);
     }
 
     public static function error(Response $response, array $status, ?array $details = null): Response
     {
         $body = [
             'success' => false,
-            'code'    => $status[1],
-            'message' => $status[2],
+            'code'    => $status['Code'],
+            'message' => $status['message'],
             'data'    => null,
         ];
         if ($details !== null) {
             $body['details'] = $details;
         }
         $response->getBody()->write(json_encode($body));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($status[0]);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status['httpStatus']);
     }
 }
