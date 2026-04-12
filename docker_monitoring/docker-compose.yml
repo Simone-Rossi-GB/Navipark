@@ -1,0 +1,155 @@
+services:
+
+  # ─── VISUALIZZAZIONE ────────────────────────────────────────────────────────
+
+  # Grafana: dashboard unica per log (Loki) e metriche (Prometheus)
+  # Raggiungibile via Caddy su https://simoxhomenet.ddns.net:5443
+  grafana:
+    image: grafana/grafana:latest
+    container_name: monitoring_grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      # Provisioning automatico: Loki e Prometheus vengono configurati
+      # come datasource al primo avvio, senza entrare nelle impostazioni
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - monitoring_network
+    environment:
+      # Admin iniziale — cambia la password dopo il primo accesso
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      # Disabilita la registrazione pubblica (accesso solo via Authentik)
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - loki
+      - prometheus
+
+  # ─── LOG ────────────────────────────────────────────────────────────────────
+
+  # Loki: riceve e archivia i log strutturati inviati da PHP (Monolog)
+  # Non esposto direttamente su internet — solo Grafana lo legge
+  # Esposto su 127.0.0.1:3100 per permettere al container PHP di scriverci
+  loki:
+    image: grafana/loki:2.9.10
+    container_name: monitoring_loki
+    restart: unless-stopped
+    ports:
+      # Bind solo su loopback dell'host: il container PHP usa host.docker.internal:3100
+      - "127.0.0.1:3100:3100"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - monitoring_network
+
+  # ─── METRICHE ───────────────────────────────────────────────────────────────
+
+  # Prometheus: raccoglie e archivia le metriche da node-exporter e postgres-exporter
+  # Non esposto su internet — solo Grafana lo legge
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: monitoring_prometheus
+    restart: unless-stopped
+    ports:
+      # Bind solo su loopback dell'host
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      # Retention metriche: 30 giorni
+      - '--storage.tsdb.retention.time=30d'
+    networks:
+      - monitoring_network
+
+  # Node Exporter: legge le metriche di sistema del Raspberry Pi (host)
+  # Ha bisogno di accedere a /proc /sys / dell'host per leggere i dati reali
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: monitoring_node_exporter
+    restart: unless-stopped
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      # Esclude filesystem virtuali non rilevanti
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - monitoring_network
+
+  # Postgres Exporter: legge le statistiche di PostgreSQL e le espone a Prometheus
+  # Si collega al database dell'app tramite lamp_network
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: monitoring_postgres_exporter
+    restart: unless-stopped
+    environment:
+      # Credenziali del database dell'app (da conf/config.php)
+      DATA_SOURCE_NAME: "postgresql://root:password@lamp_pg_db:5432/postgres?sslmode=disable"
+    networks:
+      - monitoring_network
+      # Deve essere nella stessa rete di lamp_pg_db per raggiungerlo
+      - lamp_network
+
+  # ─── MONITORING & GESTIONE ──────────────────────────────────────────────────
+
+  # Uptime Kuma: monitora che la webapp risponda (HTTP check ogni minuto)
+  # Raggiungibile via Caddy su https://simoxhomenet.ddns.net:6443
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: monitoring_uptime_kuma
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime_kuma_data:/app/data
+    networks:
+      - monitoring_network
+
+  # Dockge: UI web per gestire tutti i docker-compose del progetto
+  # Raggiungibile via Caddy su https://simoxhomenet.ddns.net:7443
+  dockge:
+    image: louislam/dockge:1
+    container_name: monitoring_dockge
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Monta la root del progetto: Dockge vedrà docker_lamp, docker_authentik,
+      # docker_monitoring come stack gestibili dalla UI
+      - /home/user/parcheggio:/opt/stacks
+      - dockge_data:/app/data
+    environment:
+      - DOCKGE_STACKS_DIR=/opt/stacks
+    networks:
+      - monitoring_network
+
+# ─── RETI ─────────────────────────────────────────────────────────────────────
+
+networks:
+  monitoring_network:
+    driver: bridge
+  # lamp_network è esterna: postgres-exporter la usa per raggiungere lamp_pg_db
+  lamp_network:
+    external: true
+
+# ─── VOLUMI ───────────────────────────────────────────────────────────────────
+
+volumes:
+  grafana_data:
+  loki_data:
+  prometheus_data:
+  uptime_kuma_data:
+  dockge_data:
