@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  # Prometheus: fonte delle metriche di sistema e PostgreSQL
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+
+  # Loki: fonte dei log PHP
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: true

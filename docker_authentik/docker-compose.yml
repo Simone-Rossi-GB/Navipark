@@ -1,0 +1,110 @@
+services:
+
+  # Database PostgreSQL dedicato ad Authentik
+  # SEPARATO dal database dell'app — non condivide nulla con lamp_pg_db
+  authentik_db:
+    image: postgres:16-alpine
+    container_name: authentik_db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d authentik -U authentik"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - authentik_pgdata:/var/lib/postgresql/data
+    networks:
+      - authentik_network
+    environment:
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_DB: authentik
+
+  # Redis: cache di sessione richiesta da Authentik
+  authentik_redis:
+    image: redis:alpine
+    container_name: authentik_redis
+    restart: unless-stopped
+    command: --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    volumes:
+      - authentik_redis:/data
+    networks:
+      - authentik_network
+
+  # Authentik Server: espone la UI e le API di autenticazione
+  # Caddy parla con lui sulla porta 9010 dell'host
+  authentik_server:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2024.12.1}
+    container_name: authentik_server
+    restart: unless-stopped
+    command: server
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik_redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik_db
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      # URL pubblico su cui Authentik è raggiungibile (usato per i redirect dopo login)
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+    ports:
+      # 9010 sull'host → 9000 nel container (HTTP)
+      # Caddy riceve su :4443 HTTPS e gira a localhost:9010
+      - "9010:9000"
+      # NON esporre 9443 perché la porta 9443 è già usata sul tuo Caddy
+    volumes:
+      - authentik_media:/media
+      - authentik_templates:/templates
+    networks:
+      - authentik_network
+    depends_on:
+      authentik_db:
+        condition: service_healthy
+      authentik_redis:
+        condition: service_healthy
+
+  # Authentik Worker: gestisce task in background (email, eventi, policy)
+  authentik_worker:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2024.12.1}
+    container_name: authentik_worker
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik_redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik_db
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - authentik_media:/media
+      - authentik_certs:/certs
+      - authentik_templates:/templates
+    networks:
+      - authentik_network
+    depends_on:
+      authentik_db:
+        condition: service_healthy
+      authentik_redis:
+        condition: service_healthy
+
+networks:
+  authentik_network:
+    driver: bridge
+
+volumes:
+  authentik_pgdata:
+  authentik_redis:
+  authentik_media:
+  authentik_certs:
+  authentik_templates:

@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+
+  # Metriche di sistema del Raspberry Pi (CPU, RAM, disco, rete, temperatura)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Metriche del database PostgreSQL (connessioni, query, cache hit ratio)
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  # Prometheus monitora se stesso (utile per debug)
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
