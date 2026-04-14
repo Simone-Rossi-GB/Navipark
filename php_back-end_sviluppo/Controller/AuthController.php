@@ -5,6 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Model\UtenteRepository;
 use Model\SessioneRepository;
+use Psr\Log\LoggerInterface;
 use Util\StatusCode;
 use Util\JsonResponse;
 use Util\Validator;
@@ -16,7 +17,8 @@ class AuthController
     public function __construct(
         private UtenteRepository   $utenti,
         private SessioneRepository $sessioni,
-        private array              $config
+        private array              $config,
+        private LoggerInterface $logger
     ) {}
 
     public function register(Request $request, Response $response): Response
@@ -50,6 +52,8 @@ class AuthController
         $token = JwtHelper::generate($id, $this->config['JWT_SECRET'], $this->config['JWT_TTL']);
         $this->sessioni->create(NanoID::generate(), $id, $token, $this->config['JWT_TTL']);
 
+        $this->logger->info('registrazione_ok', ['user_id' => $id]);
+
         return JsonResponse::success($response, StatusCode::AUTH_REGISTRAZIONE_OK, [
             'token' => $token,
             'user'  => $this->utenti->findById($id),
@@ -67,6 +71,7 @@ class AuthController
 
         $utente = $this->utenti->findByEmail($body['email']);
         if (!$utente || !password_verify($body['password'], $utente['password_hash'])) {
+            $this->logger->warning('login_fallito', ['email' => $body['email']]);
             return JsonResponse::error($response, StatusCode::AUTH_CREDENZIALI_ERRATE);
         }
 
@@ -75,6 +80,8 @@ class AuthController
         $this->utenti->updateUltimoAccesso($utente['id']);
 
         unset($utente['password_hash']);
+
+        $this->logger->info('login_ok', ['user_id' => $utente['id']]);
 
         return JsonResponse::success($response, StatusCode::AUTH_LOGIN_OK, [
             'token' => $token,
