@@ -15,6 +15,12 @@ class StatusCode
         'message' => 'Successo'
     ];
 
+    const ALIVE = [
+        'httpStatus' => 200,
+        'Code' => 'Alive',
+        'message' => 'Alive'
+    ];
+
     // STATUS CODE DI AUTENTICAZIONE E AUTORIZZAZIONE
 
     public const AUTH_TOKEN_MANCANTE = [

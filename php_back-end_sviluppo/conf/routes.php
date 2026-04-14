@@ -5,6 +5,8 @@ use Controller\ParcheggioController;
 use Controller\PrenotazioneController;
 use Middleware\AuthMiddleware;
 use Middleware\RateLimitMiddleware;
+use Util\JsonResponse;
+use Util\StatusCode;
 
 return function ($app, $container) {
     $auth = new AuthMiddleware(
@@ -12,6 +14,11 @@ return function ($app, $container) {
         $container->get('config')['JWT_SECRET'],
         $container->get(\Psr\Log\LoggerInterface::class)
     );
+
+    $app->get('/status', function ($request, $response) {
+        $response->getBody()->write('alive');
+        JsonResponse::success($response, StatusCode::ALIVE);
+    });
 
     $app->group('/auth', function ($group) use ($auth) {
         $group->post('/register', [AuthController::class, 'register']);
