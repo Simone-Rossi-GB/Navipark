@@ -91,8 +91,10 @@ class AuthController
 
     public function logout(Request $request, Response $response): Response
     {
-        $token = preg_replace('/^Bearer\s+/', '', $request->getHeaderLine('Authorization'));
+        $token  = preg_replace('/^Bearer\s+/', '', $request->getHeaderLine('Authorization'));
+        $utente = $request->getAttribute('utente');
         $this->sessioni->deleteByToken($token);
+        $this->logger->info('logout_ok', ['user_id' => $utente['utente_id'] ?? 'unknown']);
         return JsonResponse::success($response, StatusCode::AUTH_LOGOUT_OK);
     }
 

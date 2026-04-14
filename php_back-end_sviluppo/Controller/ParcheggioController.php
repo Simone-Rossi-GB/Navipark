@@ -3,6 +3,7 @@ namespace Controller;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Log\LoggerInterface;
 use Model\ParcheggioRepository;
 use Util\StatusCode;
 use Util\JsonResponse;
@@ -11,7 +12,10 @@ use Util\NanoID;
 
 class ParcheggioController
 {
-    public function __construct(private ParcheggioRepository $parcheggi) {}
+    public function __construct(
+        private ParcheggioRepository $parcheggi,
+        private LoggerInterface      $logger
+    ) {}
 
     public function getAll(Request $request, Response $response): Response
     {
@@ -39,6 +43,13 @@ class ParcheggioController
 
         $id = NanoID::generate();
         $this->parcheggi->create(array_merge($body, ['id' => $id]));
+
+        $this->logger->info('parcheggio_creato', [
+            'id'    => $id,
+            'nome'  => $body['nome'],
+            'admin' => $request->getAttribute('utente')['utente_id'],
+        ]);
+
         return JsonResponse::success($response, StatusCode::PARCHEGGIO_CREATO, $this->parcheggi->findById($id));
     }
 
@@ -52,6 +63,12 @@ class ParcheggioController
         }
 
         $this->parcheggi->update($args['id'], $request->getParsedBody() ?? []);
+
+        $this->logger->info('parcheggio_modificato', [
+            'id'    => $args['id'],
+            'admin' => $request->getAttribute('utente')['utente_id'],
+        ]);
+
         return JsonResponse::success($response, StatusCode::PARCHEGGIO_AGGIORNATO, $this->parcheggi->findById($args['id']));
     }
 
@@ -65,6 +82,12 @@ class ParcheggioController
         }
 
         $this->parcheggi->delete($args['id']);
+
+        $this->logger->info('parcheggio_eliminato', [
+            'id'    => $args['id'],
+            'admin' => $request->getAttribute('utente')['utente_id'],
+        ]);
+
         return JsonResponse::success($response, StatusCode::PARCHEGGIO_ELIMINATO);
     }
 }
