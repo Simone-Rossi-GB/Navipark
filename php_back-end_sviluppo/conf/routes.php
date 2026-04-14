@@ -46,10 +46,5 @@ return function ($app, $container) {
 
     $app->get('/admin/stats', [PrenotazioneController::class, 'getAdminStats'])->add($auth);
 
-    $app->get('/status', function ($req, $res) {
-        $res->getBody()->write(json_encode(['status' => 'ok']));
-        return $res->withHeader('Content-Type', 'application/json');
-    });
-
     $app->options('/{routes:.*}', function ($req, $res) { return $res; });
 };
