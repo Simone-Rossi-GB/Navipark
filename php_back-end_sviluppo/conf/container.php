@@ -56,6 +56,8 @@ $builder->AddDefinitions([
 
         $lokiHandler = new LokiHandler(
             ['entrypoint' => $config['LOKI_URL']],
+            Level::Debug,
+            true,
             ['app' => $config['APP_NAME'], 'env' => 'production']
         );
 
