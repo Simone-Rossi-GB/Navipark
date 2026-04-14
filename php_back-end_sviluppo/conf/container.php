@@ -11,6 +11,7 @@ use Controller\ParcheggioController;
 use Controller\PrenotazioneController;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Level;
 use Itspire\MonologLoki\Handler\LokiHandler;
 use Psr\Log\LoggerInterface;
@@ -61,9 +62,11 @@ $builder->AddDefinitions([
             ['app' => $config['APP_NAME'], 'env' => 'production']
         );
 
-        $logger->pushHandler($lokiHandler);
+        // WhatFailureGroupHandler: se Loki non è raggiungibile, il log viene
+        // scartato silenziosamente — l'app non crasha mai per un problema di logging
+        $logger->pushHandler(new WhatFailureGroupHandler([$lokiHandler]));
 
-        // fall-back
+        // fall-back su stderr per Warning+ (visibile in docker logs lamp_web)
         $logger->pushHandler(new StreamHandler('php://stderr', Level::Warning));
 
         return $logger;
