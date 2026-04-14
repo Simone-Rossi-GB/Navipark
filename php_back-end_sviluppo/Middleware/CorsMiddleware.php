@@ -11,6 +11,7 @@ class CorsMiddleware
     private array $allowed = [
         'http://localhost:5173',
         'http://localhost:4173',
+        'https://simoxhomenet.duckdns.org',
         'https://simoxhomenet.duckdns.org:1080',
     ];
 

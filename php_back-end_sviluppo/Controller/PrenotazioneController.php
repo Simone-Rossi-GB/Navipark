@@ -3,6 +3,7 @@ namespace Controller;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Log\LoggerInterface;
 use Model\PrenotazioneRepository;
 use Model\ParcheggioRepository;
 use Util\StatusCode;
@@ -14,7 +15,8 @@ class PrenotazioneController
 {
     public function __construct(
         private PrenotazioneRepository $prenotazioni,
-        private ParcheggioRepository   $parcheggi
+        private ParcheggioRepository   $parcheggi,
+        private LoggerInterface        $logger
     ) {}
 
     public function getAll(Request $request, Response $response): Response
@@ -92,6 +94,14 @@ class PrenotazioneController
         ]);
         $this->parcheggi->decrementaPostiLiberi($body['parcheggio_id']);
 
+        $this->logger->info('prenotazione_creata', [
+            'id'           => $id,
+            'user_id'      => $me['utente_id'],
+            'parcheggio'   => $parcheggio['nome'],
+            'data_inizio'  => $body['data_ora_inizio'],
+            'data_fine'    => $body['data_ora_fine'],
+        ]);
+
         return JsonResponse::success($response, StatusCode::PRENOTAZIONE_CREATA, $this->prenotazioni->findById($id));
     }
 
@@ -114,6 +124,12 @@ class PrenotazioneController
         }
 
         $this->prenotazioni->update($args['id'], $body);
+
+        $this->logger->info('prenotazione_aggiornata', [
+            'id'      => $args['id'],
+            'user_id' => $me['utente_id'],
+        ]);
+
         return JsonResponse::success($response, StatusCode::PRENOTAZIONE_AGGIORNATA, $this->prenotazioni->findById($args['id']));
     }
 
@@ -131,6 +147,13 @@ class PrenotazioneController
 
         $this->prenotazioni->cancel($args['id']);
         $this->parcheggi->incrementaPostiLiberi($pren['parcheggio_id']);
+
+        $this->logger->info('prenotazione_annullata', [
+            'id'         => $args['id'],
+            'user_id'    => $me['utente_id'],
+            'parcheggio' => $pren['parcheggio_nome'],
+        ]);
+
         return JsonResponse::success($response, StatusCode::PRENOTAZIONE_ANNULLATA, $this->prenotazioni->findById($args['id']));
     }
 

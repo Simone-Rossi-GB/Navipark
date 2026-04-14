@@ -40,12 +40,14 @@ $builder->AddDefinitions([
     ),
 
     ParcheggioController::class => fn($c) => new ParcheggioController(
-        $c->get(ParcheggioRepository::class)
+        $c->get(ParcheggioRepository::class),
+        $c->get(LoggerInterface::class)
     ),
 
     PrenotazioneController::class => fn($c) => new PrenotazioneController(
         $c->get(PrenotazioneRepository::class),
-        $c->get(ParcheggioRepository::class)
+        $c->get(ParcheggioRepository::class),
+        $c->get(LoggerInterface::class)
     ),
 
     LoggerInterface::class => function ($c) {

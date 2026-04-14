@@ -9,7 +9,8 @@ use Middleware\RateLimitMiddleware;
 return function ($app, $container) {
     $auth = new AuthMiddleware(
         $container->get(\Model\SessioneRepository::class),
-        $container->get('config')['JWT_SECRET']
+        $container->get('config')['JWT_SECRET'],
+        $container->get(\Psr\Log\LoggerInterface::class)
     );
 
     $app->group('/auth', function ($group) use ($auth) {
@@ -37,6 +38,11 @@ return function ($app, $container) {
     $app->patch('/prenotazione/id/{id}/annulla', [PrenotazioneController::class, 'cancel'])->add($auth);
 
     $app->get('/admin/stats', [PrenotazioneController::class, 'getAdminStats'])->add($auth);
+
+    $app->get('/status', function ($req, $res) {
+        $res->getBody()->write(json_encode(['status' => 'ok']));
+        return $res->withHeader('Content-Type', 'application/json');
+    });
 
     $app->options('/{routes:.*}', function ($req, $res) { return $res; });
 };
