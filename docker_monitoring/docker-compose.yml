@@ -37,8 +37,9 @@ services:
     container_name: monitoring_loki
     restart: unless-stopped
     ports:
-      # Bind solo su loopback dell'host: il container PHP usa host.docker.internal:3100
-      - "127.0.0.1:3100:3100"
+      # Esposto su tutte le interfacce: i container di altri stack lo raggiungono
+      # tramite host-gateway (host.docker.internal su Linux)
+      - "3100:3100"
     volumes:
       - ./loki/loki-config.yml:/etc/loki/local-config.yaml
       - loki_data:/loki
