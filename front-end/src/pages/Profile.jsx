@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 
 export default function Profile() {
-  const { user, logout, token } = useAuth()
+  const { user, logout, token, updateUser } = useAuth()
   const { addToast } = useToast()
   const navigate = useNavigate()
 
@@ -57,6 +57,7 @@ export default function Profile() {
     const res = await api.updateProfilo(user.id, profileData, token)
     setSavingProfile(false)
     if (res.success) {
+      updateUser(res.data)
       addToast('Profilo aggiornato con successo', 'success')
       setEditingProfile(false)
     } else {
