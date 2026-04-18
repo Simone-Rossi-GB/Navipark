@@ -71,7 +71,7 @@ class PrenotazioneController
         if (!Validator::targa($body['targa'])) {
             return JsonResponse::error($response, StatusCode::VALIDAZIONE_TARGA_NON_VALIDA);
         }
-        if (!Validator::dateRange($body['data_ora_inizio'], $body['data_ora_fine'])) {
+        if (!Validator::dataRange($body['data_ora_inizio'], $body['data_ora_fine'])) {
             return JsonResponse::error($response, StatusCode::VALIDAZIONE_DATE_NON_VALIDE);
         }
 
