@@ -26,7 +26,14 @@ class UtenteController
             return JsonResponse::error($response, StatusCode::VALIDAZIONE_CAMPI_MANCANTI, ['campi' => ['nome', 'cognome', 'telefono']]);
         }
 
-        $this->utenti->update($args['id'], $body);
+        $existing = $this->utenti->findById($args['id']);
+        $merged = array_merge([
+            'nome'     => $existing['nome'],
+            'cognome'  => $existing['cognome'],
+            'telefono' => $existing['telefono'],
+        ], $body);
+
+        $this->utenti->update($args['id'], $merged);
         return JsonResponse::success($response, StatusCode::UTENTE_AGGIORNATO, $this->utenti->findById($args['id']));
     }
 }
