@@ -147,13 +147,6 @@ export default function Search() {
                 </div>
               </div>
 
-              {booking.stato === 'attiva' && (
-                <div className="result-actions">
-                  <button className="action-button cancel" onClick={() => setShowCancelModal(true)}>
-                    🗑️ Annulla Prenotazione
-                  </button>
-                </div>
-              )}
             </div>
 
             <div className="result-footer">
