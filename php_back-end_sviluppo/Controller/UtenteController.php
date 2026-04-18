@@ -21,10 +21,9 @@ class UtenteController
             return JsonResponse::error($response, StatusCode::AUTH_ACCESSO_NEGATO);
         }
 
-        $body     = $request->getParsedBody() ?? [];
-        $mancanti = Validator::required($body, ['nome', 'cognome', 'telefono']);
-        if (!empty($mancanti)) {
-            return JsonResponse::error($response, StatusCode::VALIDAZIONE_CAMPI_MANCANTI, ['campi' => array_values($mancanti)]);
+        $body = $request->getParsedBody() ?? [];
+        if (empty($body)) {
+            return JsonResponse::error($response, StatusCode::VALIDAZIONE_CAMPI_MANCANTI, ['campi' => ['nome', 'cognome', 'telefono']]);
         }
 
         $this->utenti->update($args['id'], $body);
