@@ -3,7 +3,7 @@
 import * as mock from './mockHandlers.js'
 
 const USE_MOCK = false
-const API_BASE_URL = 'https://simoxhomenet.ddns.net:1080/v1'
+const API_BASE_URL = 'https://simoxhomenet.duckdns.org/v1'
 
 // Helper per chiamate reali al backend PHP
 async function request(method, path, body = null, token = null) {
