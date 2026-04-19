@@ -5,7 +5,10 @@ use PDO;
 
 class PrenotazioneRepository
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $pdo) {
+        private PDO $pdo,
+        private ParcheggioRepository $parcheggioRepository
+    }
 
     public function findAll(): array
     {
@@ -48,24 +51,67 @@ class PrenotazioneRepository
         return $stmt->fetchAll();
     }
 
-    public function create(array $data): bool
+    // Ritorna il numero di posti disponibili in un determinato lasso di tempo
+    // TODO: Verificare funzionamento
+    public function getPostiDisponibili(string $parcheggio_id, string $inizio, string $fine): int
     {
+        $totale = $this->parcheggioRepository->getPostiTotaliParcheggio($parcheggio_id);
+
+        $stmt = $this->pdo->prepare(
+            "SELECT COUNT(*) FROM prenotazioni
+            WHERE parcheggio_id = :parcheggio_id
+            AND stato = 'attiva'
+            AND data_ora_inizio < :fine
+            AND data_ora_fine > :inizio"
+        );
+        $stmt->execute([
+            'parcheggio_id' => $parcheggio_id,
+            'inizio'        => $inizio,
+            'fine'          => $fine,
+        ]);
+
+        $prenotazioniAttive = (int) $stmt->fetchColumn();
+        return max(0, $totale - $prenotazioniAttive);
+    }
+
+    // Creazione prenotazione: ritorna null se ci sono errori nel DB o mancanza di
+    // disponibilitá
+    // TODO: Verificare funzionamento
+    public function create(array $data): ?array
+    {
+        $disponibili = $this->getPostiDisponibili(
+            $data['parcheggio_id'],
+            $data['data_ora_inizio'],
+            $data['data_ora_fine']
+        );
+
+        if ($disponibili <= 0) {
+            return null;
+        }
+
         $stmt = $this->pdo->prepare(
             'INSERT INTO prenotazioni
-             (id, codice_prenotazione, utente_id, parcheggio_id, parcheggio_nome, targa, data_ora_inizio, data_ora_fine)
-             VALUES
-             (:id, :codice, :utente_id, :parcheggio_id, :parcheggio_nome, :targa, :inizio, :fine)'
+            (id, codice_prenotazione, utente_id, parcheggio_id, parcheggio_nome, targa, data_ora_inizio, data_ora_fine)
+            VALUES
+            (:id, :codice, :utente_id, :parcheggio_id, :parcheggio_nome, :targa, :inizio, :fine)'
         );
-        return $stmt->execute([
-            'id'             => $data['id'],
-            'codice'         => $data['codice_prenotazione'],
-            'utente_id'      => $data['utente_id'],
-            'parcheggio_id'  => $data['parcheggio_id'],
-            'parcheggio_nome'=> $data['parcheggio_nome'],
-            'targa'          => strtoupper($data['targa']),
-            'inizio'         => $data['data_ora_inizio'],
-            'fine'           => $data['data_ora_fine'],
+
+        $ok = $stmt->execute([
+            'id'              => $data['id'],
+            'codice'          => $data['codice_prenotazione'],
+            'utente_id'       => $data['utente_id'],
+            'parcheggio_id'   => $data['parcheggio_id'],
+            'parcheggio_nome' => $data['parcheggio_nome'],
+            'targa'           => $data['targa'],
+            'inizio'          => $data['data_ora_inizio'],
+            'fine'            => $data['data_ora_fine'],
         ]);
+
+        if (!$ok) {
+            return null;
+        }
+
+        return $this->findById($data['id']);
     }
 
     public function update(string $id, array $data): bool

@@ -22,6 +22,15 @@ class ParcheggioRepository
         return $row ? $this->decode($row) : null;
     }
 
+    // Ottiene la capacitá totale di un parcheggio
+    // TODO: Verificare funzionamento
+    public function getPostiTotaliParcheggio(string $parcheggio_id): int 
+    {
+        $stmt = $this->pdo->prepare('SELECT capacita_totale FROM parcheggi WHERE id = :id');
+        $stmt->execute(['id' => $parcheggio_id]);
+        return (int) $stmt->fetchColumn();
+    }
+
     public function create(array $data): bool
     {
         $stmt = $this->pdo->prepare(
