@@ -16,8 +16,7 @@ return function ($app, $container) {
     );
 
     $app->get('/status', function ($request, $response) {
-        $response->getBody()->write('alive');
-        JsonResponse::success($response, StatusCode::ALIVE);
+        return JsonResponse::success($response, StatusCode::ALIVE);
     });
 
     $app->group('/auth', function ($group) use ($auth) {

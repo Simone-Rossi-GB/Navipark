@@ -24,9 +24,6 @@ export default function Profile() {
   })
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [bookingToCancel, setBookingToCancel] = useState(null)
-  const [showModifyModal, setShowModifyModal] = useState(false)
-  const [bookingToModify, setBookingToModify] = useState(null)
-  const [modifyData, setModifyData] = useState({ targa: '', data_ora_inizio: '', data_ora_fine: '' })
   const [savingProfile, setSavingProfile] = useState(false)
   const [voices, setVoices] = useState([])
   const [selectedVoice, setSelectedVoice] = useState(() => localStorage.getItem('nav_voice') || '')
@@ -80,32 +77,6 @@ export default function Profile() {
     }
     setShowCancelModal(false)
     setBookingToCancel(null)
-  }
-
-  const openModifyModal = (booking) => {
-    setBookingToModify(booking)
-    setModifyData({
-      targa: booking.targa,
-      data_ora_inizio: booking.data_ora_inizio.slice(0, 16),
-      data_ora_fine: booking.data_ora_fine.slice(0, 16),
-    })
-    setShowModifyModal(true)
-  }
-
-  const handleConfirmModify = async () => {
-    const res = await api.updatePrenotazione(bookingToModify.id, {
-      targa: modifyData.targa.toUpperCase(),
-      data_ora_inizio: new Date(modifyData.data_ora_inizio).toISOString(),
-      data_ora_fine: new Date(modifyData.data_ora_fine).toISOString(),
-    }, token)
-    if (res.success) {
-      setBookings(prev => prev.map(b => b.id === bookingToModify.id ? res.data : b))
-      addToast('Prenotazione modificata con successo', 'success')
-      setShowModifyModal(false)
-      setBookingToModify(null)
-    } else {
-      addToast(res.message || 'Errore durante la modifica', 'error')
-    }
   }
 
   const formatDate = (iso) => {
@@ -419,9 +390,6 @@ export default function Profile() {
 
                     {booking.stato === 'attiva' && (
                       <div className="booking-actions">
-                        <button className="btn-modify" onClick={() => openModifyModal(booking)}>
-                          <Pencil size={14} /> Modifica
-                        </button>
                         <button className="btn-cancel" onClick={() => { setBookingToCancel(booking); setShowCancelModal(true) }}>
                           <Trash2 size={14} /> Annulla
                         </button>
@@ -451,43 +419,6 @@ export default function Profile() {
             <div className="modal-actions">
               <button className="btn-modal-cancel" onClick={() => setShowCancelModal(false)}>Chiudi</button>
               <button className="btn-modal-confirm" onClick={handleConfirmCancel}>Conferma Annullamento</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Modifica */}
-      {showModifyModal && bookingToModify && (
-        <div className="modal-overlay" onClick={() => setShowModifyModal(false)}>
-          <div className="modal-content small" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowModifyModal(false)}>✕</button>
-            <div className="modal-body">
-              <h3 className="modal-title">Modifica Prenotazione</h3>
-              <p className="modal-subtext" style={{ marginBottom: '1rem' }}>
-                {bookingToModify.parcheggio_nome} — <code>{bookingToModify.codice_prenotazione}</code>
-              </p>
-              <div className="parking-form">
-                <div className="form-group">
-                  <label>Targa</label>
-                  <input type="text" className="form-input" value={modifyData.targa}
-                    onChange={e => setModifyData({ ...modifyData, targa: e.target.value.toUpperCase() })}
-                    maxLength={7} placeholder="AB123CD" />
-                </div>
-                <div className="form-group">
-                  <label>Data/ora inizio</label>
-                  <input type="datetime-local" className="form-input" value={modifyData.data_ora_inizio}
-                    onChange={e => setModifyData({ ...modifyData, data_ora_inizio: e.target.value })} />
-                </div>
-                <div className="form-group">
-                  <label>Data/ora fine</label>
-                  <input type="datetime-local" className="form-input" value={modifyData.data_ora_fine}
-                    onChange={e => setModifyData({ ...modifyData, data_ora_fine: e.target.value })} />
-                </div>
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="btn-modal-cancel" onClick={() => setShowModifyModal(false)}>Annulla</button>
-              <button className="btn-save" onClick={handleConfirmModify}><Save size={14} /> Salva</button>
             </div>
           </div>
         </div>
