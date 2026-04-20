@@ -89,6 +89,9 @@ export default function Home() {
     }
     if (!bookingData.startDate || !bookingData.startHour) {
       errors.startTime = 'Data e ora di inizio sono obbligatorie'
+    }
+    if (bookingData.endDate < bookingData.startDate || bookingData.startDate < new Date()) {
+
     } else {
       const combined = new Date(`${bookingData.startDate}T${bookingData.startHour}`)
       if (isNaN(combined.getTime()) || combined < new Date(Date.now() - 5 * 60000)) {
