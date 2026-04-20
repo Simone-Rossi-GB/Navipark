@@ -19,8 +19,17 @@ CREATE TABLE utenti (
     telefono VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    ultimo_accesso TIMESTAMP
-);
+    ultimo_accesso TIMESTAMP,
+
+    -- Constraint utenti
+    CONSTRAINT formato_mail 
+        CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+    CONSTRAINT formato_telefono 
+        CHECK (telefono ~ '^\+?[\d\s\-\(\)]{6,20}$'),
+    CONSTRAINT nome_non_vuoto 
+        CHECK (TRIM(nome) <> '' AND TRIM(cognome) <> ''),
+    CONSTRAINT ultimo_accesso_non_futuro 
+        CHECK (ultimo_accesso <= CURRENT_TIMESTAMP);
 
 -- Tabella parcheggi
 CREATE TABLE parcheggi (
@@ -35,7 +44,13 @@ CREATE TABLE parcheggi (
     tipo VARCHAR(50) NOT NULL DEFAULT 'scoperto',
     servizi TEXT NOT NULL DEFAULT '[]',
     image TEXT NOT NULL DEFAULT '',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Constraint parcheggi
+    CONSTRAINT stringhe_non_vuote
+        CHECK (TRIM(nome) <> '' AND TRIM(indirizzo) <> '' AND TRIM(tipo) <> ''),
+    CONSTRAINT qta_positive
+        CHECK (capacita_totale > 0 AND tariffa_oraria >= 0);
 );
 
 -- Tabella prenotazioni
@@ -51,7 +66,16 @@ CREATE TABLE prenotazioni (
     stato stato_prenotazione DEFAULT 'attiva',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    CONSTRAINT check_date_order CHECK (data_ora_fine > data_ora_inizio)
+
+    -- Constraint prenotazioni
+    CONSTRAINT stato_valido 
+        CHECK (stato IN ('attiva', 'annullata', 'scaduta', 'completata')),
+    CONSTRAINT stringhe_non_vuote
+        CHECK (TRIM(codice_prenotazione) <> '' AND TRIM(parcheggio_nome) <> ''),
+    CONSTRAINT controlla_date
+        CHECK (data_ora_fine > data_ora_inizio AND data_ora_inizio > CURRENT_TIMESTAMP),
+    CONSTRAINT formato_targa
+        CHECK (targa ~ '^[A-Z]{2}[0-9]{3}[A-Z]{2}$');
 );
 
 -- Tabella sessioni
@@ -61,7 +85,12 @@ CREATE TABLE sessioni (
     token TEXT UNIQUE NOT NULL, -- sub+iat+exp+iss oltre i 255 caratteri
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT check_expiry CHECK (expires_at > created_at)
+
+    -- Constraint sessioni
+    CONSTRAINT controlla_scadenza 
+        CHECK (expires_at <= created_at + INTERVAL '90 days');
+    CONSTRAINT stringhe_non_vuote
+        CHECK (TRIM(token) <> '');
 );
 
 -- Indici per performance
