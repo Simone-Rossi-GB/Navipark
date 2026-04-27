@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Map, Compass, Search, User, LayoutDashboard, LogIn } from 'lucide-react'
+import { Map, Compass, Search, User, LayoutDashboard, LogIn, Ticket } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 
 export default function BottomNav() {
@@ -14,6 +14,7 @@ export default function BottomNav() {
     const items = [{ to: '/', icon: Map, label: 'Mappa' }]
     if (user) items.push({ to: '/navigator', icon: Compass, label: 'Navigatore' })
     items.push({ to: '/search', icon: Search, label: 'Cerca' })
+    if (user) items.push({ to: '/le-mie-prenotazioni', icon: Ticket, label: 'Prenotazioni' })
     if (user) items.push({ to: '/profile', icon: User, label: 'Profilo' })
     else items.push({ to: '/login', icon: LogIn, label: 'Accedi' })
     if (user && isAdmin()) items.push({ to: '/admin', icon: LayoutDashboard, label: 'Admin' })

@@ -13,6 +13,7 @@ import Register from './pages/Register'
 import Search from './pages/Search'
 import AdminDashboard from './pages/AdminDashboard'
 import Profile from './pages/Profile'
+import UserBookings from './pages/UserBookings'
 import './App.css'
 
 function ProtectedRoute({ children, adminOnly = false }) {
@@ -61,6 +62,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute adminOnly={true}>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/le-mie-prenotazioni"
+        element={
+          <ProtectedRoute>
+            <UserBookings />
           </ProtectedRoute>
         }
       />

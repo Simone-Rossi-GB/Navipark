@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../context/ToastContext'
 import * as api from '../services/api'
@@ -324,82 +324,12 @@ export default function Profile() {
               <Ticket size={18} style={{ display: 'inline', marginRight: '0.5rem', verticalAlign: 'middle' }} />
               Le Mie Prenotazioni
             </h2>
-            <span className="bookings-count">
-              {activeCount > 0 && <span style={{ color: '#16a34a', marginRight: '0.5rem' }}>{activeCount} attive</span>}
-              {bookings.length} totali
-            </span>
+            <Link to="/le-mie-prenotazioni">
+              <button className="btn-edit-profile">
+                <Ticket size={15} /> Vai alle prenotazioni
+              </button>
+            </Link>
           </div>
-
-          {loadingBookings ? (
-            <div className="empty-state"><p>Caricamento...</p></div>
-          ) : bookings.length === 0 ? (
-            <div className="empty-state">
-              <Ticket size={40} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
-              <h3>Nessuna prenotazione</h3>
-              <p>Non hai ancora effettuato prenotazioni</p>
-            </div>
-          ) : (
-            <div className="bookings-list">
-              {bookings.map(booking => {
-                const badge = statusBadge[booking.stato] || statusBadge.attiva
-                return (
-                  <div key={booking.id} className={`booking-card ${booking.stato}`}>
-                    <div className="booking-header">
-                      <div className="booking-parking">
-                        <ParkingSquare size={16} />
-                        <span className="parking-name">{booking.parcheggio_nome}</span>
-                      </div>
-                      <span className={`status-badge ${badge.cls}`}>{badge.label}</span>
-                    </div>
-
-                    <div className="booking-details">
-                      <div className="detail-row">
-                        <Ticket size={14} className="detail-icon-svg" />
-                        <div className="detail-content">
-                          <span className="detail-label">Codice</span>
-                          <span
-                            className="detail-value code"
-                            title="Clicca per copiare"
-                            onClick={() => navigator.clipboard.writeText(booking.codice_prenotazione)}
-                            style={{ cursor: 'pointer', wordBreak: 'break-all' }}
-                          >{booking.codice_prenotazione}</span>
-                        </div>
-                      </div>
-                      <div className="detail-row">
-                        <Car size={14} className="detail-icon-svg" />
-                        <div className="detail-content">
-                          <span className="detail-label">Targa</span>
-                          <span className="detail-value">{booking.targa}</span>
-                        </div>
-                      </div>
-                      <div className="detail-row">
-                        <CalendarDays size={14} className="detail-icon-svg" />
-                        <div className="detail-content">
-                          <span className="detail-label">Inizio</span>
-                          <span className="detail-value">{formatDate(booking.data_ora_inizio)}</span>
-                        </div>
-                      </div>
-                      <div className="detail-row">
-                        <Flag size={14} className="detail-icon-svg" />
-                        <div className="detail-content">
-                          <span className="detail-label">Fine</span>
-                          <span className="detail-value">{formatDate(booking.data_ora_fine)}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {booking.stato === 'attiva' && (
-                      <div className="booking-actions">
-                        <button className="btn-cancel" onClick={() => { setBookingToCancel(booking); setShowCancelModal(true) }}>
-                          <Trash2 size={14} /> Annulla
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          )}
         </div>
       </div>
 
