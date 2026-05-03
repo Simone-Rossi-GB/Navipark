@@ -1,9 +1,9 @@
 <?php
 
+namespace Util;
+
 use Hidehalo\Nanoid\Client;
 use Hidehalo\Nanoid\GeneratorInterface;
-
-namespace Util;
 
 class NanoID {
 
