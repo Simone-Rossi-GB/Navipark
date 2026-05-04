@@ -1,6 +1,6 @@
 <?php
 return [
-    'DB_DSN'     => 'pgsql:host=lamp_pg_db;port=5432;dbname=postgres',
+    'DB_DSN'     => 'pgsql:host=lamp_pg_db;port=5432;dbname=navipark',
     'DB_USER'    => 'root',
     'DB_PWD'    => 'password',
     'BASEPATH'   => '/v1',

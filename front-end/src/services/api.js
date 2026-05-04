@@ -16,7 +16,13 @@ async function request(method, path, body = null, token = null) {
   })
   const text = await res.text()
   try {
-    const data = JSON.parse(text)
+      const data = JSON.parse(text)
+      if (data.code === 'A003') {
+          localStorage.removeItem('auth_user')
+          localStorage.removeItem('auth_token')
+          window.location.href = '/login'
+          return data
+      }
     if (!data.success) {
       console.error(`[API ${res.status}] ${method} ${path} →`, data.code, '|', data.message, data.data ?? '')
     }

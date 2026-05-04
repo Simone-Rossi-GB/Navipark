@@ -28,9 +28,9 @@ return function ($app, $container) {
     $app->put('/utente/id/{id}', [UtenteController::class, 'update'])->add($auth);
 
     $app->get('/prenotazione', [PrenotazioneController::class, 'getAll'])->add($auth);
-    $app->post('/prenotazione', [PrenotazioneController::class, 'create']);
+    $app->post('/prenotazione', [PrenotazioneController::class, 'create'])->add($auth);
     $app->get('/prenotazione/id/{id}', [PrenotazioneController::class, 'getById'])->add($auth);
-    $app->get('/prenotazione/codice/{codice}', [PrenotazioneController::class, 'getByCodice'])->add($auth);
+    $app->get('/prenotazione/codice/{codice}', [PrenotazioneController::class, 'getByCodice']);
     $app->get('/prenotazione/utente/{userId}', [PrenotazioneController::class, 'getByUtente'])->add($auth);
     $app->get('/prenotazione/parcheggio/{id}', [PrenotazioneController::class, 'getByParcheggio'])->add($auth);
     $app->put('/prenotazione/id/{id}', [PrenotazioneController::class, 'update'])->add($auth);

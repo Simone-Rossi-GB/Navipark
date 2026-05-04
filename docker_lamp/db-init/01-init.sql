@@ -4,6 +4,8 @@
 -- Abilita l'estensione per funzioni crittografiche
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+CREATE DATABASE navipark OWNER root;
+
 -- Crea i tipi ENUM
 CREATE TYPE tipo_posto AS ENUM ('standard', 'disabili', 'elettrico', 'moto');
 CREATE TYPE stato_prenotazione AS ENUM ('attiva', 'annullata', 'scaduta', 'completata');
@@ -77,6 +79,8 @@ CREATE TABLE prenotazioni (
     CONSTRAINT formato_targa
         CHECK (targa ~ '^[A-Z]{2}[0-9]{3}[A-Z]{2}$');
 );
+
+CREATE TABLE archivio_prenotazioni (LIKE prenotazioni INCLUDING ALL);
 
 -- Tabella sessioni
 CREATE TABLE sessioni (

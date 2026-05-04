@@ -103,10 +103,14 @@ export function useNavigation() {
     const lastSpokenDistance = useRef(1000)
     const isSpeakingRef = useRef(false)
     const isMutedRef = useRef(false)
+    const speechResumeIntervalRef = useRef(null)
 
 
     const startNavigation = async (destination) => {
         setIsNavigating(true)
+        speechResumeIntervalRef.current = setInterval(() => {
+            if (window.speechSynthesis?.paused) window.speechSynthesis.resume()
+        }, 5000)
         speakInstruction("navigazione attivata. Percorso verso " + (destination.nome ?? destination.name ?? ''), isMutedRef.current)
 
         watchIDref.current = navigator.geolocation.watchPosition(
@@ -160,6 +164,10 @@ export function useNavigation() {
             navigator.geolocation.clearWatch(watchIDref.current)
         }
         setIsNavigating(false)
+        if (speechResumeIntervalRef.current) {
+            clearInterval(speechResumeIntervalRef.current)
+            speechResumeIntervalRef.current = null
+        }
         setRoute(null)
         setUserPosition(null)
         setDistance(null)

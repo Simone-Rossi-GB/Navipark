@@ -316,21 +316,6 @@ export default function Profile() {
             </button>
           )}
         </div>
-
-        {/* Prenotazioni */}
-        <div className="profile-section">
-          <div className="section-header">
-            <h2 className="section-title">
-              <Ticket size={18} style={{ display: 'inline', marginRight: '0.5rem', verticalAlign: 'middle' }} />
-              Le Mie Prenotazioni
-            </h2>
-            <Link to="/le-mie-prenotazioni">
-              <button className="btn-edit-profile">
-                <Ticket size={15} /> Vai alle prenotazioni
-              </button>
-            </Link>
-          </div>
-        </div>
       </div>
 
       {/* Modal Annullamento */}

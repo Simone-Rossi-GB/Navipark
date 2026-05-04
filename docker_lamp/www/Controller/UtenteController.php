@@ -14,20 +14,21 @@ class UtenteController
 
     public function update(Request $request, Response $response, array $args): Response
     {
-        $me = $request->getAttribute('utente');
-
-        // Un utente può modificare solo se stesso (admin può modificare chiunque)
-        if ($args['id'] !== $me['utente_id'] && $me['ruolo'] !== 'Admin') {
-            return JsonResponse::error($response, StatusCode::AUTH_ACCESSO_NEGATO);
+        $body = $request->getParsedBody() ?? [];
+        if (empty($body)) {
+            return JsonResponse::error($response, StatusCode::VALIDAZIONE_CAMPI_MANCANTI, ['campi' => ['nome', 'cognome', 'telefono']]);
         }
 
-        $body     = $request->getParsedBody() ?? [];
-        $mancanti = Validator::required($body, ['nome', 'cognome', 'telefono']);
-        if (!empty($mancanti)) {
-            return JsonResponse::error($response, StatusCode::VALIDAZIONE_CAMPI_MANCANTI, ['campi' => array_values($mancanti)]);
-        }
+        $existing = $this->utenti->findById($args['id']);
+        if (!$existing) return JsonResponse::error($response, StatusCode::UTENTE_NON_TROVATO);
 
-        $this->utenti->update($args['id'], $body);
+        $merged = array_merge([
+            'nome'     => $existing['nome'],
+            'cognome'  => $existing['cognome'],
+            'telefono' => $existing['telefono'],
+        ], $body);
+
+        $this->utenti->update($args['id'], $merged);
         return JsonResponse::success($response, StatusCode::UTENTE_AGGIORNATO, $this->utenti->findById($args['id']));
     }
 }

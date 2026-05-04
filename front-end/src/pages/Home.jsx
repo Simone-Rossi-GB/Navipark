@@ -35,12 +35,21 @@ export default function Home() {
   const [formErrors, setFormErrors] = useState({})
   const [bookingCode, setBookingCode] = useState('')
   const [submitting, setSubmitting] = useState(false)
+    const [userBookings, setUserBookings] = useState([])
+    const [bookingsPanelOpen, setBookingsPanelOpen] = useState(true)
 
-  useEffect(() => {
+    useEffect(() => {
     api.getParcheggi().then(res => {
       if (res.success) setParkings(res.data)
     })
   }, [])
+
+    useEffect(() => {
+        if (!user || !token) return
+        api.getPrenotazioniByUser(user.id, token).then(res => {
+            if (res.success) setUserBookings(res.data.filter(b => b.stato === 'attiva'))
+        })
+    }, [user])
 
   useEffect(() => {
     setMapStyle(prev => {
@@ -55,7 +64,7 @@ export default function Home() {
     return parkings.filter(p => {
       if (q && !p.nome?.toLowerCase().includes(q) && !p.indirizzo?.toLowerCase().includes(q)) return false
       if (filters.type !== 'all' && p.tipo !== filters.type) return false
-      if (p.tariffa_oraria > filters.priceRange[1]) return false
+        if (parseFloat(p.tariffa_oraria) > filters.priceRange[1]) return false
       if (p.posti_liberi < filters.minFreeSpots) return false
       if (filters.amenities.length > 0) {
         if (!filters.amenities.every(a => p.servizi?.includes(a))) return false
@@ -179,6 +188,40 @@ export default function Home() {
         </div>
       </main>
 
+        {user && (
+            <aside className={`bookings-right-panel${bookingsPanelOpen ? '' : ' bookings-panel-collapsed'}`}>
+                <button
+                    className="bookings-panel-toggle"
+                    onClick={() => setBookingsPanelOpen(p => !p)}
+                >
+                    {bookingsPanelOpen ? '›' : '‹'}
+                </button>
+                {bookingsPanelOpen && (
+                    <>
+                        <h3 className="bookings-panel-title">Prenotazioni attive</h3>
+                        {userBookings.length === 0 ? (
+                            <p className="bookings-panel-empty">Nessuna prenotazione attiva</p>
+                        ) : (
+                            <div className="bookings-panel-list">
+                                {userBookings.map(b => (
+                                    <div key={b.id} className="bookings-panel-card">
+                                        <span className="bpc-nome">{b.parcheggio_nome}</span>
+                                        <span className="bpc-targa">{b.targa}</span>
+                                        <span className="bpc-data">
+                  {new Date(b.data_ora_inizio).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit' })}
+                                            {' '}
+                                            {new Date(b.data_ora_inizio).toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' })}
+                </span>
+                                        <button className="bpc-cancel" onClick={() => handleCancelBooking(b)}>Annulla</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
+            </aside>
+        )}
+
       {/* Modal prenotazione */}
       {showModal && selectedParking && (
         <div className="modal-overlay" onClick={closeModal}>
@@ -191,9 +234,9 @@ export default function Home() {
                 <h3 className="modal-title">{selectedParking.nome}</h3>
                 <p className="modal-address">{selectedParking.indirizzo}</p>
                 <div className="modal-stats">
-                  <span className="modal-price">€{selectedParking.tariffa_oraria.toFixed(2)}/ora</span>
+                    <span className="modal-price">€{parseFloat(selectedParking.tariffa_oraria).toFixed(2)}/ora</span>
                   <span className={`modal-spots ${selectedParking.posti_liberi < 10 ? 'low' : ''}`}>
-                    {selectedParking.posti_liberi} posti liberi
+                    {selectedParking.posti_liberi} posti liberi ora
                   </span>
                 </div>
               </div>
@@ -266,7 +309,7 @@ export default function Home() {
                   <div className="summary-row">
                     <span>Costo stimato:</span>
                     <span className="summary-price">
-                      €{(selectedParking.tariffa_oraria * bookingData.duration).toFixed(2)}
+                      €{(parseFloat(selectedParking.tariffa_oraria) * bookingData.duration).toFixed(2)}
                     </span>
                   </div>
                 </div>

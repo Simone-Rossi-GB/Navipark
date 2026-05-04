@@ -368,7 +368,7 @@ export default function AdminDashboard() {
                     <div className="admin-card-body">
                       <div className="admin-card-row"><span>Indirizzo</span><span>{p.indirizzo}</span></div>
                       <div className="admin-card-row"><span>Posti liberi</span><span className={p.posti_liberi < 10 ? 'text-red' : 'text-green'}>{p.posti_liberi}/{p.capacita_totale}</span></div>
-                      <div className="admin-card-row"><span>Tariffa</span><span>€{p.tariffa_oraria.toFixed(2)}/h</span></div>
+                        <span>€{parseFloat(p.tariffa_oraria).toFixed(2)}/h</span>
                       <div className="admin-card-actions">
                         <button className="btn-edit" title="Modifica" onClick={() => handleEditParking(p)}><Pencil size={14} /></button>
                         <button className="btn-delete" title="Elimina" onClick={() => { setParkingToDelete(p); setShowDeleteModal(true) }}><Trash2 size={14} /></button>
@@ -407,7 +407,7 @@ export default function AdminDashboard() {
                     <td className="text-center">
                       <span className={p.posti_liberi < 10 ? 'text-red' : 'text-green'}>{p.posti_liberi}</span>
                     </td>
-                    <td>€{p.tariffa_oraria.toFixed(2)}/h</td>
+                      <td>€{parseFloat(p.tariffa_oraria).toFixed(2)}/h</td>
                     <td className="actions">
                       <button className="btn-edit" onClick={() => handleEditParking(p)} title="Modifica"><Pencil size={14} /></button>
                       <button className="btn-delete" onClick={() => { setParkingToDelete(p); setShowDeleteModal(true) }} title="Elimina"><Trash2 size={14} /></button>

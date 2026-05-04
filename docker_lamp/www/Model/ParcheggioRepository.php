@@ -9,14 +9,34 @@ class ParcheggioRepository
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM parcheggi ORDER BY nome');
+        $stmt = $this->pdo->prepare('
+        SELECT p.*,
+          GREATEST(p.capacita_totale - COUNT(pr.id), 0) AS posti_liberi_ora
+        FROM parcheggi p
+        LEFT JOIN prenotazioni pr ON pr.parcheggio_id = p.id
+          AND pr.stato = \'attiva\'
+          AND pr.data_ora_inizio <= NOW()
+          AND pr.data_ora_fine >= NOW()
+        GROUP BY p.id
+        ORDER BY p.nome
+    ');
         $stmt->execute();
         return array_map([$this, 'decode'], $stmt->fetchAll());
     }
 
     public function findById(string $id): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM parcheggi WHERE id = :id');
+        $stmt = $this->pdo->prepare('
+        SELECT p.*,
+          GREATEST(p.capacita_totale - COUNT(pr.id), 0) AS posti_liberi_ora
+        FROM parcheggi p
+        LEFT JOIN prenotazioni pr ON pr.parcheggio_id = p.id
+          AND pr.stato = \'attiva\'
+          AND pr.data_ora_inizio <= NOW()
+          AND pr.data_ora_fine >= NOW()
+        WHERE p.id = :id
+        GROUP BY p.id
+    ');
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
         return $row ? $this->decode($row) : null;
