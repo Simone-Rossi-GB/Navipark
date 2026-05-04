@@ -5,7 +5,7 @@ import { useToast } from '../context/ToastContext'
 import * as api from '../services/api'
 import {
   User, Mail, Phone, Pencil, Save, X,
-  Ticket, Car, CalendarDays, Flag,
+  Car, CalendarDays, Flag,
   Trash2, LogOut, ParkingSquare, ShieldCheck, Volume2
 } from 'lucide-react'
 

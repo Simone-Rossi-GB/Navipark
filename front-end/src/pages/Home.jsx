@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext'
 import ParkingMap from '../features/ParkingMap'
 import FilterPanel from '../components/FilterPanel'
 import * as api from '../services/api'
-import { SlidersHorizontal, X } from 'lucide-react'
+import { SlidersHorizontal, X, Trash2 } from 'lucide-react'
 
 // Validazione targa italiana: 2 lettere, 3 cifre, 2 lettere (es. AB123CD)
 const TARGA_REGEX = /^[A-Z]{2}[0-9]{3}[A-Z]{2}$/
@@ -37,6 +37,8 @@ export default function Home() {
   const [submitting, setSubmitting] = useState(false)
     const [userBookings, setUserBookings] = useState([])
     const [bookingsPanelOpen, setBookingsPanelOpen] = useState(true)
+    const [showCancelModal, setShowCancelModal] = useState(false)
+    const [bookingToCancel, setBookingToCancel] = useState(null)
 
     useEffect(() => {
     api.getParcheggi().then(res => {
@@ -58,6 +60,23 @@ export default function Home() {
       return prev
     })
   }, [darkMode])
+
+    const handleCancelBooking = (b) => {
+        setBookingToCancel(b)
+        setShowCancelModal(true)
+    }
+
+    const handleConfirmCancel = async () => {
+        const res = await api.cancelPrenotazione(bookingToCancel.id, token)
+        if (res.success) {
+            setUserBookings(prev => prev.filter(b => b.id !== bookingToCancel.id))
+            addToast('Prenotazione annullata', 'success')
+        } else {
+            addToast(res.message || 'Errore durante l\'annullamento', 'error')
+        }
+        setShowCancelModal(false)
+        setBookingToCancel(null)
+    }
 
   const filteredParkings = useMemo(() => {
     const q = searchQuery.toLowerCase()
@@ -208,11 +227,13 @@ export default function Home() {
                                         <span className="bpc-nome">{b.parcheggio_nome}</span>
                                         <span className="bpc-targa">{b.targa}</span>
                                         <span className="bpc-data">
-                  {new Date(b.data_ora_inizio).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit' })}
+    {new Date(b.data_ora_inizio).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit' })}
                                             {' '}
                                             {new Date(b.data_ora_inizio).toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' })}
-                </span>
-                                        <button className="bpc-cancel" onClick={() => handleCancelBooking(b)}>Annulla</button>
+  </span>
+                                        <button className="btn-cancel" onClick={() => handleCancelBooking(b)}>
+                                            <Trash2 size={14} /> Annulla
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -220,6 +241,26 @@ export default function Home() {
                     </>
                 )}
             </aside>
+        )}
+
+        {showCancelModal && bookingToCancel && (
+            <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
+                <div className="modal-content small" onClick={e => e.stopPropagation()}>
+                    <button className="modal-close" onClick={() => setShowCancelModal(false)}>✕</button>
+                    <div className="modal-body">
+                        <div className="warning-icon">⚠️</div>
+                        <h3 className="modal-title">Annulla Prenotazione</h3>
+                        <p className="modal-text">
+                            Sei sicuro di voler annullare la prenotazione per <strong>{bookingToCancel.parcheggio_nome}</strong>?
+                        </p>
+                        <p className="modal-subtext">Targa: <code>{bookingToCancel.targa}</code></p>
+                    </div>
+                    <div className="modal-actions">
+                        <button className="btn-modal-cancel" onClick={() => setShowCancelModal(false)}>Chiudi</button>
+                        <button className="btn-modal-confirm" onClick={handleConfirmCancel}>Conferma Annullamento</button>
+                    </div>
+                </div>
+            </div>
         )}
 
       {/* Modal prenotazione */}

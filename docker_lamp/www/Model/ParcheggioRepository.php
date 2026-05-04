@@ -117,6 +117,10 @@ class ParcheggioRepository
     private function decode(array $row): array
     {
         $row['servizi'] = json_decode($row['servizi'] ?? '[]', true) ?? [];
+        if (isset($row['posti_liberi_ora'])) {
+            $row['posti_liberi'] = (int) $row['posti_liberi_ora'];
+            unset($row['posti_liberi_ora']);
+        }
         return $row;
     }
 }

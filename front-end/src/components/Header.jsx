@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../context/ThemeContext'
-import { Map, Search, Compass, LayoutDashboard } from 'lucide-react'
+import { Map, Search, Compass, LayoutDashboard, Ticket } from 'lucide-react'
 import * as api from '../services/api'
 
 export default function Header() {
@@ -63,6 +63,13 @@ export default function Header() {
               <span>Navigatore</span>
             </NavLink>
           )}
+
+            {user && (
+                <NavLink to="/le-mie-prenotazioni" className="nav-link">
+                    <Ticket size={18} strokeWidth={1.75} />
+                    <span>Prenotazioni</span>
+                </NavLink>
+            )}
 
           {user && isAdmin() && (
             <NavLink to="/admin" className="nav-link">
