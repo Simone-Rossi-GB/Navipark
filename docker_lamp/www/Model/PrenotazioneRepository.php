@@ -11,14 +11,15 @@ class PrenotazioneRepository
     {
         $stmt = $this->pdo->prepare('SELECT * FROM prenotazioni ORDER BY created_at DESC');
         $stmt->execute();
-        return $stmt->fetchAll();
+        return array_map([$this, 'decode'], $stmt->fetchAll());
     }
 
     public function findById(string $id): ?array
     {
         $stmt = $this->pdo->prepare('SELECT * FROM prenotazioni WHERE id = :id');
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch() ?: null;
+        $row = $stmt->fetch();
+        return $row ? $this->decode($row) : null;
     }
 
     public function findByCodice(string $codice): ?array
@@ -27,7 +28,8 @@ class PrenotazioneRepository
             'SELECT * FROM prenotazioni WHERE LOWER(codice_prenotazione) = LOWER(:codice)'
         );
         $stmt->execute(['codice' => $codice]);
-        return $stmt->fetch() ?: null;
+        $row = $stmt->fetch();
+        return $row ? $this->decode($row) : null;
     }
 
     public function findByUtente(string $utenteId): array
@@ -36,7 +38,7 @@ class PrenotazioneRepository
             'SELECT * FROM prenotazioni WHERE utente_id = :id ORDER BY created_at DESC'
         );
         $stmt->execute(['id' => $utenteId]);
-        return $stmt->fetchAll();
+        return array_map([$this, 'decode'], $stmt->fetchAll());
     }
 
     public function findByParcheggio(string $parcheggioId): array
@@ -45,7 +47,7 @@ class PrenotazioneRepository
             'SELECT * FROM prenotazioni WHERE parcheggio_id = :id ORDER BY created_at DESC'
         );
         $stmt->execute(['id' => $parcheggioId]);
-        return $stmt->fetchAll();
+        return array_map([$this, 'decode'], $stmt->fetchAll());
     }
 
     public function create(array $data): bool
@@ -66,6 +68,29 @@ class PrenotazioneRepository
             'inizio'         => $data['data_ora_inizio'],
             'fine'           => $data['data_ora_fine'],
         ]);
+    }
+
+    public function countOverlapping(string $parcheggioId, string $inizio, string $fine): int
+    {
+        $stmt = $this->pdo->prepare('
+        SELECT COUNT(*) FROM prenotazioni
+        WHERE parcheggio_id = :id
+          AND stato = \'attiva\'
+          AND data_ora_inizio < :fine
+          AND data_ora_fine > :inizio
+    ');
+        $stmt->execute(['id' => $parcheggioId, 'inizio' => $inizio, 'fine' => $fine]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    private function decode(array $row): array
+    {
+        foreach (['data_ora_inizio', 'data_ora_fine', 'created_at', 'updated_at'] as $field) {
+            if (!empty($row[$field]) && !str_ends_with($row[$field], 'Z')) {
+                $row[$field] = str_replace(' ', 'T', $row[$field]) . 'Z';
+            }
+        }
+        return $row;
     }
 
     public function update(string $id, array $data): bool

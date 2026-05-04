@@ -93,9 +93,13 @@ export default function Home() {
   }, [filters, parkings, searchQuery])
 
   const handleParkingClick = (parking) => {
-    if (!user) { navigate('/login'); return }
-    setSelectedParking(parking)
-    setShowModal(true)
+      if (!user) { navigate('/login'); return }
+      if (parking.posti_liberi <= 0) {
+          addToast('Parcheggio al completo in questo momento', 'error')
+          return
+      }
+      setSelectedParking(parking)
+      setShowModal(true)
     setBookingCode('')
     setFormErrors({})
     const start = new Date(Date.now() + 30 * 60000)
@@ -227,10 +231,15 @@ export default function Home() {
                                         <span className="bpc-nome">{b.parcheggio_nome}</span>
                                         <span className="bpc-targa">{b.targa}</span>
                                         <span className="bpc-data">
-    {new Date(b.data_ora_inizio).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit' })}
+  Inizio: {new Date(b.data_ora_inizio).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit' })}
                                             {' '}
                                             {new Date(b.data_ora_inizio).toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' })}
-  </span>
+</span>
+                                        <span className="bpc-data">
+  Fine: {new Date(b.data_ora_fine).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit' })}
+                                            {' '}
+                                            {new Date(b.data_ora_fine).toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' })}
+</span>
                                         <button className="btn-cancel" onClick={() => handleCancelBooking(b)}>
                                             <Trash2 size={14} /> Annulla
                                         </button>

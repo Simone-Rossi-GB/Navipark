@@ -132,7 +132,7 @@ export default function ParkingMap({ parkings, onParkingClick, mapStyle = 'stree
                 <span className={(selectedParking.posti_liberi ?? selectedParking.freeSpots) < 10 ? 'text-red' : 'text-green'}>
                   {selectedParking.posti_liberi ?? selectedParking.freeSpots}
                 </span>
-                /{selectedParking.capacita_totale ?? selectedParking.totalSpots} posti liberi
+                /{selectedParking.capacita_totale ?? selectedParking.totalSpots} posti liberi ora
               </p>
               <p className="popup-address">{selectedParking.indirizzo ?? selectedParking.address}</p>
               <div className="popup-buttons">

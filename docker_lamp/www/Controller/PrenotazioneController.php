@@ -75,7 +75,13 @@ class PrenotazioneController
 
         $parcheggio = $this->parcheggi->findById($body['parcheggio_id']);
         if (!$parcheggio) return JsonResponse::error($response, StatusCode::PARCHEGGIO_NON_TROVATO);
-        if ($parcheggio['posti_liberi'] <= 0) {
+
+        $occupati = $this->prenotazioni->countOverlapping(
+            $body['parcheggio_id'],
+            $body['data_ora_inizio'],
+            $body['data_ora_fine']
+        );
+        if ($occupati >= $parcheggio['capacita_totale']) {
             return JsonResponse::error($response, StatusCode::PARCHEGGIO_PIENO);
         }
 
